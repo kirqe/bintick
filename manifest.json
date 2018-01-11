@@ -14,5 +14,8 @@
     "storage",
     "https://api.binance.com/",
     "https://bittrex.com/"
+  ],
+  "web_accessible_resources": [
+    "loader.gif",
   ]
 }

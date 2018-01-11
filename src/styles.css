@@ -1,0 +1,48 @@
+@import '../node_modules/bulma/css/bulma.css';
+
+
+.header-panel {
+  background: #f8f8f8;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 50px;
+  box-shadow: 0px 5px 25px #d8d8d8;
+}
+
+.header-panel .field {
+  width: 50%;
+  display: inline-block;
+}
+
+.header-panel .title {
+  color: #fff;
+}
+
+.loader-i {
+  width: 50px;
+}
+
+.loader-wrap {
+  /* margin-top: 50px; */
+  text-align: center;
+}
+
+.results {
+  margin-top: 50px;
+
+}
+
+.table {
+
+}
+
+.table tr td {
+  font-size: 14px;
+}
+
+.table .crypto-icon img {
+  width: 20px;
+  height: 20px;
+}
