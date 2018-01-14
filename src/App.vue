@@ -9,12 +9,15 @@
         </div>
       </div>
 
-      <div class=" is-pulled-right">
+      <span class="tag is-light">Portfolio Total Value: 00.00</span>
+      <span class="tag is-light">1 BTC = {{currencyVal[1]}} {{currencyVal[0]}}</span>
+
+      <div class="is-pulled-right">
         <div class="control">
+
           <div class="select is-small">
-            <select>
-              <option>Select currency</option>
-              <option>With options</option>
+            <select v-model="currency" @change="updatedCurrencyVal(currency)">
+              <option v-for="opt in currencyOpts">{{opt}}</option>
             </select>
           </div>
         </div>
@@ -23,8 +26,8 @@
       <div class=" is-clearfix"></div>
     </div>
 
-
-    <table-items :cryptos="byTerm" :loaded="this.loaded"></table-items>
+    <!-- <table-items :cryptos="byTerm" :loaded="loaded" :currencyVal="currencyVal"></table-items> -->
+    <list-items :cryptos="byTerm" :loaded="loaded" :currencyVal="currencyVal"></list-items>
   </div>
 </template>
 
@@ -33,18 +36,25 @@ import axios from 'axios'
 import _ from 'underscore'
 import Crypto from './Crypto.js'
 import TableItems from './TableItems.vue'
+import ListItems from './ListItems.vue'
 
 export default {
   name: 'app',
   components: {
-    TableItems
+    TableItems,
+    ListItems
   },
   data () {
     return {
       cryptos: [],
-      filteredCryptos: [],
       searchTerm: '',
-      loaded: false
+      currency: "USD",
+      currencyVal: {
+        symbol: '$',
+        price: 0
+      },
+      currencyOpts: ['USD', 'EUR', 'CNY', 'GBP', 'RUB'],
+      loaded: false,
     }
   },
   beforeMount () {
@@ -54,28 +64,40 @@ export default {
     // setInterval(() => {
     //   this.updateStats()
     // }, 5000)
+
   },
   methods: { //0 getmarketsummaries
     fetchData () {
       var cryptos = []
       this.loaded = false;
-      Promise.all([this.getCryptos(), this.getMarkets(), this.getBtcPriceIn()]).then(data => {
+      Promise.all([this.getCryptos(), this.getMarkets(), this.getBtcPriceIn(this.currency)]).then(data => {
         console.log(data);
         return data; // many to assign o variable
 
       }).then(data =>{
-
+        this.currencyVal = data[2]
         for (var i = 0; i < data[0].length; i++) {
-          var c = new Crypto(
-            data[1][i].MarketCurrency,
-            data[1][i].BaseCurrency,
-            data[0][i].MarketName,
-            data[1][i].LogoUrl,
-            data[0][i].Last.toFixed(8) * data[2],
-            data[0][i].PrevDay.toFixed(8) * data[2],
-            data[0][i].Volume);
+          var crypto = {
+            marketCurrency: data[1][i].MarketCurrency,
+            baseCurrency: data[1][i].BaseCurrency,
+            marketName: data[0][i].MarketName,
+            logoUrl: data[1][i].LogoUrl,
+            last: data[0][i].Last,
+            prevDay: data[0][i].PrevDay,
+            volume: data[0][i].Volume,
+            cryptoUrl: `https://bittrex.com/Market/Index?MarketName=${data[0][i].MarketName}`
+          }
 
-            cryptos.push(c);
+          // var c = new Crypto(
+          //   data[1][i].MarketCurrency,
+          //   data[1][i].BaseCurrency,
+          //   data[0][i].MarketName,
+          //   data[1][i].LogoUrl,
+          //   data[0][i].Last,
+          //   data[0][i].PrevDay,
+          //   data[0][i].Volume);
+
+            cryptos.push(crypto);
         }
         this.loaded = true;
       })
@@ -104,9 +126,10 @@ export default {
         return _.sortBy(res.data.result, (item) => { return item.MarketName })
       })
     },
-    getBtcPriceIn (currency = "USD") {
+    getBtcPriceIn (currency) {
       return axios.get("https://blockchain.info/ticker").then((res) => {
-        return res.data[currency].last
+        this.currencyOpts = Object.keys(res.data)
+        return [res.data[currency].last, res.data[currency].symbol]
       })
     },
     openCryptoPage (url) {
@@ -127,6 +150,12 @@ export default {
       //   return crypto.marketName.toLowerCase().indexOf(pair.toLowerCase()) !== -1
       // })
       // this.cryptos = filtered
+    },
+    updatedCurrencyVal (currency) {
+
+      this.getBtcPriceIn(currency).then(data => {
+        this.currencyVal = data
+      })
     }
   },
   computed: {
@@ -152,7 +181,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
 
   color: #2c3e50;
-  width: 700px;
+  width: 600px;
   height: 600px;
   overflow : scroll;
 }
