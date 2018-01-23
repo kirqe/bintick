@@ -4,7 +4,7 @@
   "author": "kirqe <railsr@yahoo.com>",
   "private": true,
   "scripts": {
-    "watchify": "watchify -vd -p browserify-hmr -e -g envify -t cssify src/main.js -o dist/build.js",
+    "watchify": "watchify -vd -p browserify-hmr -e -g envify -t cssify src/main.js background.js -o dist/build.js",
     "serve": "http-server -o -s -c 1 -a localhost",
     "dev": "npm-run-all --parallel watchify serve",
     "build": "cross-env NODE_ENV=production browserify -g envify src/main.js -t cssify | uglifyjs -c warnings=false -m > dist/build.js"

@@ -1,32 +1,30 @@
 <template lang="html">
-  <li @click="toggleOptions()">
+  <li @click="showOptions()" >
     <div class="list-item">
-      <span class="list-item-section crypto-icon"><img :src="crypto.logoUrl"/></span>
-
-      <span class="list-item-section market-name"><a @click="openCryptoPage(crypto.cryptoUrl)">{{crypto.marketName}}</a></span>
-
-      <span class="list-item-section today-price">
-        <small>
-          {{currencyVal[1]}} {{ (crypto.last * currencyVal[0]) | toFixed4 }}
-          <strong v-bind:class="{ up: status.isUp, down: status.isDown, still: status.isStill }">({{ percentDifference(crypto) }})</strong>
-        </small><br/>
-        <small>{{crypto.baseCurrency}} {{crypto.last}}</small>
-      </span>
-
-      <!-- <span class="list-item-section yesterday-price">
-        <small>
-          {{currencyVal[1]}} {{ crypto.prevDay * currencyVal[0] | toFixed4 }}
-        </small><br/>
-        <small>{{crypto.baseCurrency}} {{crypto.prevDay}}</small>
+      <!-- <span class="list-item-section crypto-icon">
+        <img :src="crypto.logoUrl"/>
       </span> -->
 
-      <span class="list-item-section volume">
-        <small>{{currencyVal[1]}} {{ (crypto.volume  * currencyVal[0]) | toFixed2 }}</small><br/>
-        <small>{{crypto.baseCurrency}} {{ crypto.volume | toFixed2 }}</small>
+      <!-- <span class="list-item-section market-name">
+        <a @click="openCryptoPage(crypto.cryptoUrl)">{{crypto.marketName}}</a>
+      </span> -->
+
+      <span class="list-item-section today-price">
+        <a @click="openCryptoPage(crypto.cryptoUrl)">{{crypto.marketName}}</a>
+
+        <small>
+          {{currencyVal[1]}} {{ (crypto.last * currencyVal[0]) | toFixed4 }}
+          <strong v-bind:class="{ up: status.isUp, down: status.isDown, still: status.isStill }">
+            ({{ percentDifference(crypto) }})
+          </strong>
+        </small><br/>
+        <small>{{crypto.baseCurrency}} {{crypto.last | toFixed8}}</small>
       </span>
+
+
     </div>
 
-    <list-item-options v-if="showOptions" :crypto="crypto"></list-item-options>
+    <list-item-options v-if="isEditing" :crypto="crypto" @doneEditing="hideOptions"></list-item-options>
   </li>
 
 </template>
@@ -45,7 +43,13 @@ export default {
         isDown: false,
         isStill: true
       },
-      showOptions: false
+      isEditing: false
+      // holdings: 0,
+      // notification: {
+      //   active: false,
+      //   above: 0,
+      //   below:: 0
+      // }
     }
   },
   computed: {
@@ -54,8 +58,12 @@ export default {
     }
   },
   methods: {
-    toggleOptions (event) {
-      this.showOptions = !this.showOptions
+    showOptions (event) {
+      this.isEditing = true
+    },
+    hideOptions (value) {
+      // this.isEditing = false
+      console.log(value);
     },
     openCryptoPage (url) {
       chrome.tabs.create({url: url});
@@ -96,19 +104,16 @@ export default {
 
 <style lang="css">
   .crypto-icon {
-    width: 7%;
+    width: 15%;
   }
   .market-name {
-    width: 13%;
+    width: 30%;
   }
   .today-price {
-    width: 25%;
-  }
-  .yesterday-price {
-    width: 25%;
+    width: 100%;
   }
   .volume {
-    width: 25%;
+    width: 35%;
   }
   .up {
     color: #4caf50;

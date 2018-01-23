@@ -1,6 +1,6 @@
 # cryptoticker
 
-> Crypto stats chrome extension
+> Crypto stats chrome extension with notifications and portfolio ish
 
 ## Build Setup
 
@@ -14,12 +14,3 @@ npm run dev
 # build for production with minification
 npm run build
 ```
-
-For more information see the [docs for vueify](https://github.com/vuejs/vueify).
-
-
-
-possible todos
-
-add vuex
-add more exchanges(binance)

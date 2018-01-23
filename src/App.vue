@@ -9,12 +9,10 @@
         </div>
       </div>
 
-      <span class="tag is-light">Portfolio Total Value: 00.00</span>
-      <span class="tag is-light">1 BTC = {{currencyVal[1]}} {{currencyVal[0]}}</span>
 
-      <div class="is-pulled-right">
+
+      <div class="is-pulled-right mlr3">
         <div class="control">
-
           <div class="select is-small">
             <select v-model="currency" @change="updatedCurrencyVal(currency)">
               <option v-for="opt in currencyOpts">{{opt}}</option>
@@ -23,10 +21,12 @@
         </div>
       </div>
 
-      <div class=" is-clearfix"></div>
+      <div class="is-clearfix"></div>
+    </div>
+    <div class="portfolio">
+      <span class="tag is-info mlr3">Portfolio Value: {{currencyVal[1]}} {{totalValue.toFixed(4)}}</span>
     </div>
 
-    <!-- <table-items :cryptos="byTerm" :loaded="loaded" :currencyVal="currencyVal"></table-items> -->
     <list-items :cryptos="byTerm" :loaded="loaded" :currencyVal="currencyVal"></list-items>
   </div>
 </template>
@@ -34,14 +34,11 @@
 <script>
 import axios from 'axios'
 import _ from 'underscore'
-import Crypto from './Crypto.js'
-import TableItems from './TableItems.vue'
 import ListItems from './ListItems.vue'
 
 export default {
   name: 'app',
   components: {
-    TableItems,
     ListItems
   },
   data () {
@@ -54,54 +51,98 @@ export default {
         price: 0
       },
       currencyOpts: ['USD', 'EUR', 'CNY', 'GBP', 'RUB'],
+      exchange: 'bittrex.com',
+      exchanges: [],
       loaded: false,
     }
   },
   beforeMount () {
-    this.fetchData()
+    this.fetchOrUpdate()
   },
   mounted () {
-    // setInterval(() => {
-    //   this.updateStats()
-    // }, 5000)
+    setInterval(() => {
 
+    }, 5000)
   },
   methods: { //0 getmarketsummaries
-    fetchData () {
-      var cryptos = []
-      this.loaded = false;
-      Promise.all([this.getCryptos(), this.getMarkets(), this.getBtcPriceIn(this.currency)]).then(data => {
+    fetchOrUpdate () {
+      Promise.all([
+        this.getCryptos(),
+        this.getMarkets(),
+        this.getBtcPriceIn(this.currency)]).then(data => {
         console.log(data);
         return data; // many to assign o variable
 
       }).then(data =>{
+        var cryptos = []
+        this.loaded = false;
+
         this.currencyVal = data[2]
         for (var i = 0; i < data[0].length; i++) {
           var crypto = {
+            holdings: 0,
+            notify: false,
+            notifications: {
+              above: 'undefined',
+              below: 'undefined'
+            },
             marketCurrency: data[1][i].MarketCurrency,
             baseCurrency: data[1][i].BaseCurrency,
             marketName: data[0][i].MarketName,
             logoUrl: data[1][i].LogoUrl,
             last: data[0][i].Last,
             prevDay: data[0][i].PrevDay,
-            volume: data[0][i].Volume,
             cryptoUrl: `https://bittrex.com/Market/Index?MarketName=${data[0][i].MarketName}`
           }
-
-          // var c = new Crypto(
-          //   data[1][i].MarketCurrency,
-          //   data[1][i].BaseCurrency,
-          //   data[0][i].MarketName,
-          //   data[1][i].LogoUrl,
-          //   data[0][i].Last,
-          //   data[0][i].PrevDay,
-          //   data[0][i].Volume);
-
             cryptos.push(crypto);
         }
         this.loaded = true;
+
+        this.cryptos = cryptos;
+
+        chrome.storage.local.get('storage_cryptos', (data) => {
+          if (_.isEmpty(data.storage_cryptos)) {
+            console.log("empt");
+            chrome.storage.local.set({'storage_cryptos': this.cryptos});
+          }
+        });
+
+        // console.log("set to chrome storage local");
+        //
+        // if (_.isEmpty)
+        // chrome.storage.local.set({'data': storage_cryptos});
+
+        // console.log("added the following fields");
+
+
+
+        // chrome.storage.local.get('storage_cryptos', (d) => {
+        //   console.log("inside get storage");
+        //
+        //     console.log(d);
+        //     var copy = d.storage_cryptos
+        //
+        //     var t = _.find(copy, (item) => {
+        //       return item.marketName == 'BTC-1ST'
+        //     })
+        //     t.holdings = 20000
+        //
+        //
+        //
+        //
+        //
+        //     var storage_cryptos = []
+        //     var fields = ['marketName', 'logoUrl', 'holdings', 'notify', 'notified', 'notifications']
+        //     chrome.storage.local.set({'storage_cryptos': copy});
+        //
+        //
+        // });
+
+
+
+
       })
-      this.cryptos = cryptos;
+
 
     },
     updateStats () {
@@ -132,15 +173,9 @@ export default {
         return [res.data[currency].last, res.data[currency].symbol]
       })
     },
-    openCryptoPage (url) {
-      chrome.tabs.create({url: url});
-    },
     searchForCrypto (event) {
       this.$emit('search', event.target.value);
 
-      // var cr = this.cryptos
-      //
-      //
       var pair = event.target.value
       if (this.searchTerm === '') {
         return
@@ -159,6 +194,9 @@ export default {
     }
   },
   computed: {
+    totalValue () {
+      return _.reduce(this.cryptos, (acc, crypto) => { return acc + (crypto.holdings * crypto.last ) * this.currencyVal[0] }, 0)
+    },
     byVolume () {
       return _.sortBy(this.cryptos, (item) => { return item.volume })
     },
@@ -166,7 +204,7 @@ export default {
       return _.where(this.cryptos, { baseCurrency: "BTC" })
     },
     byTerm () {
-      return _.filter(this.cryptos, (crypto) => {
+      return _.filter(this.byBaseCurrency, (crypto) => {
         return crypto.marketName.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1
       })
     }
@@ -181,9 +219,9 @@ export default {
   -moz-osx-font-smoothing: grayscale;
 
   color: #2c3e50;
-  width: 600px;
+  width: 300px;
   height: 600px;
-  overflow : scroll;
+  overflow-y: scroll;
 }
 
 

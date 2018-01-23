@@ -4,6 +4,18 @@
       <img src="./loader.gif" class="loader-i"/>
     </div>
     <ul class="list-items">
+      <li>
+        <div class="list-item">
+          <span class="list-item-section crypto-icon"></span>
+
+          <span class="list-item-section market-name"></span>
+
+          <span class="list-item-section today-price"></span>
+
+          <!-- <span class="list-item-section volume">Volume</span> -->
+        </div>
+
+      </li>
       <list-item v-for="crypto in cryptos" :crypto="crypto" :currencyVal="currencyVal"></list-item>
     </ul>
   </div>
