@@ -5,23 +5,28 @@
         <img :src="crypto.logoUrl"/>
       </span> -->
 
-      <!-- <span class="list-item-section market-name">
-        <a @click="openCryptoPage(crypto.cryptoUrl)">{{crypto.marketName}}</a>
-      </span> -->
+      <span class="list-item-section market-name">
+        <a @click="">{{crypto.MarketName}}</a>
+      </span>
+
+
+
+      <span class="list-item-section holdings">
+        <span v-if="holdings > 0">
+          {{holdings}}<br/>
+          {{holdings * crypto.Last | toFixed8 }}
+        </span>
+      </span>
 
       <span class="list-item-section today-price">
-        <a @click="openCryptoPage(crypto.cryptoUrl)">{{crypto.marketName}}</a>
-
         <small>
-          {{currencyVal[1]}} {{ (crypto.last * currencyVal[0]) | toFixed4 }}
+          {{currencyVal[1]}} {{ (crypto.Last * currencyVal[0]) | toFixed4 }}
           <strong v-bind:class="{ up: status.isUp, down: status.isDown, still: status.isStill }">
             ({{ percentDifference(crypto) }})
           </strong>
         </small><br/>
-        <small>{{crypto.baseCurrency}} {{crypto.last | toFixed8}}</small>
+        <small>{{crypto.BaseCurrency}} {{crypto.Last | toFixed8}}</small>
       </span>
-
-
     </div>
 
     <list-item-options v-if="isEditing" :crypto="crypto" @doneEditing="hideOptions"></list-item-options>
@@ -38,24 +43,34 @@ export default {
   },
   data () {
     return {
+      portfolioItem: {},
       status: {
         isUp: false,
         isDown: false,
         isStill: true
       },
       isEditing: false
-      // holdings: 0,
-      // notification: {
-      //   active: false,
-      //   above: 0,
-      //   below:: 0
-      // }
+
     }
   },
   computed: {
-    usdVolumePrice () {
-      return (this.crypto.volume * this.currencyVal[0]).toFixed()
+    holdings () {
+      if (_.has(this.portfolioItem, "holdings")) {
+        if (this.portfolioItem.holdings == 0) {
+          return 0
+        }
+        return this.portfolioItem.holdings;
+      }
     }
+  },
+  mounted() {
+    let name = this.crypto.MarketName
+    chrome.storage.local.get('portfolio', (data) => {
+      let existing = _.find(data.portfolio, (item) => {
+        return item.id == name
+      })
+      this.portfolioItem = existing
+    })
   },
   methods: {
     showOptions (event) {
@@ -69,8 +84,8 @@ export default {
       chrome.tabs.create({url: url});
     },
     percentDifference(crypto) {
-      var last = crypto.last
-      var prevDay = crypto.prevDay
+      var last = crypto.Last
+      var prevDay = crypto.PrevDay
       var decrease = (last - prevDay) / last * 100
       if (decrease > 0) {
         this.status.isUp = true
@@ -103,17 +118,14 @@ export default {
 </script>
 
 <style lang="css">
-  .crypto-icon {
-    width: 15%;
-  }
   .market-name {
-    width: 30%;
+    width: 20%;
   }
   .today-price {
-    width: 100%;
+    width: 40%;
   }
-  .volume {
-    width: 35%;
+  .holdings {
+    width: 40%;
   }
   .up {
     color: #4caf50;

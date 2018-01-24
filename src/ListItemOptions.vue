@@ -3,7 +3,7 @@
     <div class="field">
       <label class="label is-small">Holdings:</label>
       <div class="control">
-        <input class="input is-small" v-model="editedItem.holdings" type="number" placeholder="Quantity">
+        <input class="input is-small" v-model="portfolioItem.holdings" type="number" placeholder="Quantity">
       </div>
       <!-- <p class="help">This is a help text</p> -->
     </div>
@@ -11,9 +11,9 @@
     <div class="field">
       <label class="label is-small">Show notification when price is: </label>
       <div class="control">
-        <input class="input is-small" type="number"
-        :placeholder="this.placeholderAbove"
-        v-model="editedItem.notifications.above"
+        <input class="input is-small" type="number" :step="0.00000001" :min="0.00000000"
+        placeholder="above this value (btc)"
+        v-model="portfolioItem.notify_above"
         @focus="setAboveDefault()">
       </div>
       <!-- <p class="help">This is a help text</p> -->
@@ -21,9 +21,9 @@
 
     <div class="field">
       <div class="control">
-        <input class="input is-small" type="number"
-        :placeholder="this.placeholderBelow"
-        v-model="editedItem.notifications.below"
+        <input class="input is-small" type="number" :step="0.00000001" :min="0.00000000"
+        placeholder="below this value (btc)"
+        v-model="portfolioItem.notify_below"
         @focus="setBelowDefault()">
       </div>
       <!-- <p class="help">This is a help text</p> -->
@@ -31,17 +31,11 @@
 
     <div class="field">
       <div class="control">
-        <!-- <div class="select is-small">
-          <select v-model="editedItem.notify" @change="setNotification(noption)">
-            <option v-for="noption in notifyOptions">{{noption}}</option>
-          </select>
-        </div> -->
-        <input type="checkbox" id="checkbox" v-model="editedItem.notify">
-        <label for="checkbox">Show notifications</label>
-          <a class="button is-info is-small is-pulled-right" @click="save(editedItem)">Save</a>
+        <input type="checkbox" :id="portfolioItem.id" v-model="portfolioItem.notify">
+        <label :for="portfolioItem.id">Show notifications</label>
+        <a class="button is-info is-small is-pulled-right" @click="save()">Save</a>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -51,101 +45,75 @@ export default {
   props: ["crypto"],
   data () {
     return {
-      storageItem: {},
-      editedItem: {
-        marketName: "",
+      portfolioItem: {
+        id: "",
         holdings: 0,
         notify: false,
-        notifications: {
-          above: 'undefined',
-          below: 'undefined'
-        }
+        notify_above: 'undefined',
+        notify_below: 'undefined'
       }
     }
   },
   computed: {
-    placeholderAbove () {
-      return `above ${(this.crypto.last + 0.00000001).toFixed(8)} ${this.crypto.baseCurrency}`
-    },
-    placeholderBelow () {
-      return `below ${(this.crypto.last - 0.00000001).toFixed(8)} ${this.crypto.baseCurrency}`
-    },
-    storageHoldings () {
-      chrome.storage.local.get(this.crypto.marketName, (item) => {
-
-        return item[Object.keys(item)[0]].holdings
-        // var newItem = baseItem
-        // newItem.holdings = 1000
-        //
-        // console.log(baseItem);
-        // console.log(newItem);
-        //
-        // chrome.storage.local.set({[`${baseItem.marketName}`]: Object.assign(baseItem, newItem)});
-
-
-      });
+    holdingsValue () {
+      // TODO: holdings * btcvalue * currency
     }
   },
   methods: {
     setAboveDefault () {
       console.log("set above");
-      console.log(this.editedItem);
-      if (this.editedItem.notifications.above <= 0 ||
-         this.editedItem.notifications.above == 'undefined') {
-        this.editedItem.notifications.above = (this.crypto.last + 0.00000001).toFixed(8)
+      console.log(this.portfolioItem);
+      if (this.portfolioItem.notify_above <= 0 ||
+         this.portfolioItem.notify_above == 'undefined') {
+        this.portfolioItem.notify_above = (this.crypto.Last + 0.00000001).toFixed(8)
       }
     },
     setBelowDefault () {
       console.log("set below");
-      console.log(this.editedItem)
-      if (this.editedItem.notifications.below <= 0 ||
-         this.editedItem.notifications.below == 'undefined') {
-        this.editedItem.notifications.below = (this.crypto.last - 0.00000001).toFixed(8)
+      console.log(this.portfolioItem)
+      if (this.portfolioItem.notify_below <= 0 ||
+         this.portfolioItem.notify_below == 'undefined') {
+        this.portfolioItem.notify_below = (this.crypto.Last - 0.00000001).toFixed(8)
       }
     },
-    setNotification () {
-
-    },
-    save (crypto) {
+    save () {
       console.log("as");
-      // chrome.alarms.create('check_price', { delayInMinutes: 0.5, periodInMinutes: 0.5});
 
-
-      this.$emit('doneEditing', crypto)
-
-
-// var c =  this.crypto.marketName
-      chrome.storage.local.get('storage_cryptos', (cryptos) => {
-        console.log("inside get storage");
-
-          console.log(cryptos);
-          var copy = cryptos.storage_cryptos
-
-          var t = _.find(copy, (item) => {
-            return item.marketName == this.editedItem.marketName
+      var portfolioItems = []
+      chrome.storage.local.get('portfolio', (data) => {
+        var exists = _.find(data.portfolio, (item) => {
+          return item.id == this.crypto.MarketName
+        })
+        if (exists == undefined) {
+          console.log("ADDING NEW");
+          data.portfolio.push(Object.assign(this.portfolioItem, {id: this.crypto.MarketName}))
+          chrome.storage.local.set(data)
+        } else {
+          console.log("UPDATING OLD");
+          var updatedData = _.map(data.portfolio, (item) => {
+            if (item.id == exists.id) {
+              item = Object.assign(item, this.portfolioItem)
+            }
+            return item
           })
-          Object.assign(t, this.editedItem)
+          console.log(updatedData);
+           chrome.storage.local.set({ 'portfolio': updatedData })
+        }
 
+      })
 
-
-          // var storage_cryptos = []
-          // var fields = ['marketName', 'logoUrl', 'holdings', 'notify', 'notified', 'notifications']
-          chrome.storage.local.set({'storage_cryptos': copy});
-
-
-      });
-
+      // this.$emit('doneEditing', crypto)
 
     }
 
   },
   mounted() {
-    var c =  this.crypto.marketName
-    chrome.storage.local.get('storage_cryptos', (data) => {
-      var baseItem = _.find(data.storage_cryptos, function(item) {
-        return item.marketName == c
+    let name = this.crypto.MarketName
+    chrome.storage.local.get('portfolio', (data) => {
+      let existing = _.find(data.portfolio, (item) => {
+        return item.id == name
       })
-      Object.assign(this.editedItem, baseItem)
+      this.portfolioItem = existing || Object.assign(this.portfolioItem, {id: this.crypto.MarketName})
     })
   }
 

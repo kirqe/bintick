@@ -1,8 +1,17 @@
 chrome.alarms.create('check_price', { delayInMinutes: 0.5, periodInMinutes: 0.5});
 
 
-chrome.alarms.onAlarm.addListener((alarm) => {
+var fetchNewData = () => {
+  console.log("fetching new data using background.js#fetchNewData");
+  Promise.resolve(axios.get("https://bittrex.com/api/v1.1/public/getmarketsummaries")
+  .then((res) => { return res.data.result }))
+  .then((data) => { chrome.storage.local.set({'storage_cryptos': data}); })
+}
 
+// fetchNewData() === window;
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+    fetchNewData()
 
     chrome.storage.local.get('storage_cryptos', (data) => {
       var watch_items = _.filter(data.storage_cryptos, (item) => {
@@ -10,24 +19,19 @@ chrome.alarms.onAlarm.addListener((alarm) => {
       })
       console.log("watch_items");
       console.log(watch_items);
-      Promise.resolve(axios.get("https://bittrex.com/api/v1.1/public/getmarketsummaries")
-      .then((res) => { return res.data.result }))
-      .then((data) => {
 
-
+      chrome.storage.local.get('storage_cryptos', data => {
         var res = []
-        var watch_markets = _.map(watch_items, (item) => {
-          return item.marketName
-        })
+        var watch_markets = ["BTC-1ST"]
+        // _.map(watch_items, (item) => {
+        //   return item.MarketName
+        // })
 
         console.log(watch_markets);
 
-        var new_items = _.filter(data, (new_item) => {
+        var new_items = _.filter(data.storage_cryptos, (new_item) => {
           return _.contains(watch_markets, new_item.MarketName)
         })
-
-        console.log('new_items');
-        console.log(new_items);
 
         for(var i = 0; i < watch_items.length; i++) {
           console.log("inside loop");
@@ -55,6 +59,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           }
         }
       })
+
+
+      //
     });
 
 

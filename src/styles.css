@@ -1,11 +1,10 @@
 @import '../node_modules/bulma/css/bulma.css';
 
-
 .header-panel {
   background: #f8f8f8;
   position: absolute;
   top: 0;
-  width: 300px;
+  width: 450px;
   padding: 10px;
   height: 50px;
   z-index: 999;
@@ -21,7 +20,7 @@
 }
 
 .portfolio {
-  width: 300px;
+  width: 450px;
   position: absolute;
   margin-top: 50px;
   background-color: #209cee;
@@ -30,7 +29,7 @@
 }
 
 .list-items-wrapper {
-  margin-top: 60px;
+  margin-top: 75px;
 }
 
 .plr3 {
@@ -78,7 +77,8 @@
   width: 25px;
 }
 .list-item-section {
-  flex-direction: column;
+  /* flex-direction: column; */
+  text-align: right;
 }
 .list-item-options {
   background-color: #f8f8f8;

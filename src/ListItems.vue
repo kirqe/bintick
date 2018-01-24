@@ -6,11 +6,12 @@
     <ul class="list-items">
       <li>
         <div class="list-item">
-          <span class="list-item-section crypto-icon"></span>
 
-          <span class="list-item-section market-name"></span>
 
-          <span class="list-item-section today-price"></span>
+          <span class="list-item-section market-name">Symbol</span>
+          <span class="list-item-section holdings">Holdings</span>
+          <span class="list-item-section today-price">Price</span>
+
 
           <!-- <span class="list-item-section volume">Volume</span> -->
         </div>
