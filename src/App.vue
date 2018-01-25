@@ -16,11 +16,11 @@
           <a href="./about.html" class="button is-small">i</a>
         </div>
       </div>
-
+      {{currency}}
       <div class="is-pulled-right mlr3">
         <div class="control">
           <div class="select is-small">
-            <select v-model="currency" @change="updatedCurrencyVal(currency)">
+            <select v-model="currency">
               <option v-for="opt in currencyOpts">{{opt}}</option>
             </select>
           </div>
@@ -34,7 +34,7 @@
       <span class="tag is-info mlr3">Portfolio Value: {{currencyVal[1]}} {{totalValue.toFixed(4)}}</span>
     </div>
 
-    <list-items :cryptos="byVolume" :loaded="loaded" :currencyVal="currencyVal"></list-items>
+    <list-items :cryptos="byVolume" :loaded="loaded" :currency="currency" :rates="rates"></list-items>
   </div>
 </template>
 
@@ -51,6 +51,7 @@ export default {
   data () {
     return {
       cryptos: [],
+      rates: [],
       searchTerm: '',
       currency: "USD",
       currencyVal: {
@@ -64,47 +65,65 @@ export default {
     }
   },
   beforeMount () {
-    this.fetchOrUpdate()
+    // prents user from breaking api rulles
+    chrome.storage.local.get('timestamp', (data) => {
+      if (data.timestamp == null) {
+        this.fetchOrUpdate()
+      } else {
+        var range = (new Date).getTime() - data.timestamp
+        if (range >= 10000) {
+          this.fetchOrUpdate()
+        } else {
+          chrome.storage.local.get(['storage_cryptos', 'rates'], (data) => {
+            this.rates = data.rates
+            this.currencyOpts = Object.keys(data.rates)
+            this.cryptos = data.storage_cryptos
+            this.loaded = true
+          })
+        }
+      }
+    })
   },
   mounted () {
-    setInterval(() => {
 
-    }, 5000)
   },
   methods: { //0 getmarketsummaries
     fetchOrUpdate () {
+      console.log("INSIDE FETCH");
       Promise.all([
         this.getCryptos(),
-        this.getBtcPriceIn(this.currency)]).then(data => {
+        this.getBtcPrice()]).then(data => {
         console.log(data);
         return data; // many to assign o variable
 
-      }).then(data =>{
+      }).then(data => {
         var cryptos = []
         this.loaded = false;
 
-        this.currencyVal = data[1] // fetched cryptos
+        // this.currencyVal = data[1] // fetched cryptos
 
         this.cryptos = data[0];
+        this.rates = data[1];
+        this.currencyOpts = Object.keys(data[1])
+        console.log("SETTING STORAGE_CRYPTOS AND TIMESTAMP");
+        chrome.storage.local.set({'storage_cryptos': data[0], 'rates': data[1], 'timestamp': (new Date).getTime() });
         this.loaded = true;
-        chrome.storage.local.get('storage_cryptos', (data) => {
-          if (_.isEmpty(data.storage_cryptos)) {
-            console.log("empt");
-            chrome.storage.local.set({'storage_cryptos': this.cryptos});
-          }
-        });
+
       })
+
+    },
+    fetchNew () {
 
     },
     getCryptos () {
-      return axios.get("https://bittrex.com/api/v1.1/public/getmarketsummaries").then((res) => {
-        return _.sortBy(res.data.result, (item) => { return item.MarketName })
+      console.log("HITTING BINANCE");
+      return axios.get("https://api.binance.com/api/v1/ticker/24hr").then((res) => {
+        return _.sortBy(res.data, (item) => { return item.symbol })
       })
     },
-    getBtcPriceIn (currency) {
+    getBtcPrice () {
       return axios.get("https://blockchain.info/ticker").then((res) => {
-        this.currencyOpts = Object.keys(res.data)
-        return [res.data[currency].last, res.data[currency].symbol]
+        return res.data//[res.data[currency].last, res.data[currency].symbol]
       })
     },
     searchForCrypto (event) {
@@ -117,9 +136,9 @@ export default {
 
     },
     updatedCurrencyVal (currency) {
-      this.getBtcPriceIn(currency).then(data => {
-        this.currencyVal = data
-      })
+      // this.getBtcPriceIn(currency).then(data => {
+        this.currency = data
+      // })
     }
   },
   computed: {

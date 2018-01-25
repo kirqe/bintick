@@ -6,26 +6,26 @@
       </span> -->
 
       <span class="list-item-section market-name">
-        <a @click="">{{crypto.MarketName}}</a>
+        <a @click="">{{crypto.symbol}}</a>
       </span>
-
-
 
       <span class="list-item-section holdings">
         <span v-if="holdings > 0">
           {{holdings}}<br/>
-          {{holdings * crypto.Last | toFixed8 }}
+          {{holdings * crypto.lastPrice }}
         </span>
       </span>
 
       <span class="list-item-section today-price">
         <small>
-          {{currencyVal[1]}} {{ (crypto.Last * currencyVal[0]) | toFixed4 }}
+
+          {{ this.rates[this.currency]["symbol"] }} {{ (crypto.lastPrice * this.rates[this.currency]["last"]) | toFixed4 }}
+
           <strong v-bind:class="{ up: status.isUp, down: status.isDown, still: status.isStill }">
             ({{ percentDifference(crypto) }})
           </strong>
         </small><br/>
-        <small>{{crypto.BaseCurrency}} {{crypto.Last | toFixed8}}</small>
+        <small>{{crypto.baseCurrency}} {{crypto.lastPrice }}</small>
       </span>
     </div>
 
@@ -37,7 +37,7 @@
 <script>
 import ListItemOptions from './ListItemOptions.vue'
 export default {
-  props: ["crypto", "loaded", "currencyVal"],
+  props: ["crypto", "loaded", "currency", "rates"],
   components: {
     ListItemOptions
   },
@@ -50,7 +50,6 @@ export default {
         isStill: true
       },
       isEditing: false
-
     }
   },
   computed: {
@@ -61,16 +60,20 @@ export default {
         }
         return this.portfolioItem.holdings;
       }
+    },
+    sb () {
+      return
     }
   },
   mounted() {
-    let name = this.crypto.MarketName
-    chrome.storage.local.get('portfolio', (data) => {
+    let name = this.crypto.symbol
+    chrome.storage.local.get(['portfolio'], (data) => {
       let existing = _.find(data.portfolio, (item) => {
         return item.id == name
       })
       this.portfolioItem = existing
     })
+
   },
   methods: {
     showOptions (event) {
@@ -84,9 +87,8 @@ export default {
       chrome.tabs.create({url: url});
     },
     percentDifference(crypto) {
-      var last = crypto.Last
-      var prevDay = crypto.PrevDay
-      var decrease = (last - prevDay) / last * 100
+      var decrease = crypto.priceChangePercent
+
       if (decrease > 0) {
         this.status.isUp = true
         this.status.isDown = false
@@ -100,7 +102,7 @@ export default {
         this.status.isDown = false
         this.status.isStill = true
       }
-      return `${decrease.toFixed(2)} %`
+      return `${decrease} %`
     }
   },
   filters: {

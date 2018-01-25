@@ -3,9 +3,9 @@ chrome.alarms.create('check_price', { delayInMinutes: 0.5, periodInMinutes: 0.5}
 
 var fetchNewData = () => {
   console.log("fetching new data using background.js#fetchNewData");
-  Promise.resolve(axios.get("https://bittrex.com/api/v1.1/public/getmarketsummaries")
-  .then((res) => { return res.data.result }))
-  .then((data) => { chrome.storage.local.set({'storage_cryptos': data}); })
+  // Promise.resolve(axios.get("https://bittrex.com/api/v1.1/public/getmarketsummaries")
+  // .then((res) => { return res.data.result }))
+  // .then((data) => { chrome.storage.local.set({'storage_cryptos': data}); })
 }
 
 // fetchNewData() === window;

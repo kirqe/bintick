@@ -17,7 +17,7 @@
         </div>
 
       </li>
-      <list-item v-for="crypto in cryptos" :crypto="crypto" :currencyVal="currencyVal"></list-item>
+      <list-item v-for="crypto in cryptos" :crypto="crypto" :currency="currency" :rates="rates"></list-item>
     </ul>
   </div>
 </template>
@@ -25,7 +25,7 @@
 <script>
 import ListItem from './ListItem.vue'
 export default {
-  props: ["cryptos", "loaded", "currencyVal"],
+  props: ["cryptos", "loaded", "rates", "currency"],
   components: {
     ListItem
   }

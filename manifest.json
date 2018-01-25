@@ -19,7 +19,8 @@
     "storage",
     "notifications",
     "alarms",
-    "https://bittrex.com/api/"
+    "https://bittrex.com/api/",
+    "https://api.binance.com/"
   ],
   "web_accessible_resources": [
     "loader.gif"
