@@ -1,11 +1,22 @@
 chrome.alarms.create('check_price', { delayInMinutes: 0.5, periodInMinutes: 0.5});
 
+var getCryptos = () => {
+  console.log("HITTING BINANCE");
+  return axios.get("https://api.binance.com/api/v1/ticker/24hr").then((res) => {
+    return _.sortBy(res.data, (item) => { return item.symbol })
+  })
+}
+var getBtcPrice = () => {
+  return axios.get("https://blockchain.info/ticker").then((res) => {
+    return res.data
+  })
+}
 
 var fetchNewData = () => {
   console.log("fetching new data using background.js#fetchNewData");
-  // Promise.resolve(axios.get("https://bittrex.com/api/v1.1/public/getmarketsummaries")
-  // .then((res) => { return res.data.result }))
-  // .then((data) => { chrome.storage.local.set({'storage_cryptos': data}); })
+  Promise.all([getCryptos(), getBtcPrice()])
+  .then((res) => { return res })
+  .then((data) => { chrome.storage.local.set({'storage_cryptos': data[0], 'rates': data[1]}) })
 }
 
 // fetchNewData() === window;

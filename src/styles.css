@@ -4,7 +4,7 @@
   background: #f8f8f8;
   position: absolute;
   top: 0;
-  width: 450px;
+  width: 100%;
   padding: 10px;
   height: 50px;
   z-index: 999;
@@ -20,11 +20,11 @@
 }
 
 .portfolio {
-  width: 450px;
+  width: 100%;
   position: absolute;
   margin-top: 50px;
   background-color: #209cee;
-  margin-bottom: 50px;
+  /* margin-bottom: 50px; */
   z-index: 999;
 }
 
@@ -77,8 +77,7 @@
   width: 25px;
 }
 .list-item-section {
-  /* flex-direction: column; */
-  text-align: right;
+  text-align: left;
 }
 .list-item-options {
   background-color: #f8f8f8;

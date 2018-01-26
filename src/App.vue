@@ -13,7 +13,7 @@
       <div class="is-pulled-right mlr3">
         <div class="control">
           <!-- <a href="./about.html">i</a> -->
-          <a href="./about.html" class="button is-small">i</a>
+          <a @click="panel = !panel"  class="button is-small">i</a>
         </div>
       </div>
       {{currency}}
@@ -31,10 +31,11 @@
       <div class="is-clearfix"></div>
     </div>
     <div class="portfolio">
-      <span class="tag is-info mlr3">Portfolio Value: {{currencyVal[1]}} {{totalValue.toFixed(4)}}</span>
+      <span class="tag is-info mlr3">Portfolio Value: {{totalValue}}</span>
     </div>
+    <panel @close="() => {panel = false}" v-if="panel"></panel>
+    <list-items v-if="!panel" :cryptos="byVolume" :loaded="loaded" :currency="currency" :rates="rates"></list-items>
 
-    <list-items :cryptos="byVolume" :loaded="loaded" :currency="currency" :rates="rates"></list-items>
   </div>
 </template>
 
@@ -42,11 +43,13 @@
 import axios from 'axios'
 import _ from 'underscore'
 import ListItems from './ListItems.vue'
+import Panel from './Panel.vue'
 
 export default {
   name: 'app',
   components: {
-    ListItems
+    ListItems,
+    Panel
   },
   data () {
     return {
@@ -54,18 +57,13 @@ export default {
       rates: [],
       searchTerm: '',
       currency: "USD",
-      currencyVal: {
-        symbol: '$',
-        price: 0
-      },
       currencyOpts: ['USD', 'EUR', 'CNY', 'GBP', 'RUB'],
-      exchange: 'bittrex.com',
-      exchanges: [],
       loaded: false,
+      panel: false
     }
   },
   beforeMount () {
-    // prents user from breaking api rulles
+    // prents user from hitting api too often
     chrome.storage.local.get('timestamp', (data) => {
       if (data.timestamp == null) {
         this.fetchOrUpdate()
@@ -85,16 +83,25 @@ export default {
     })
   },
   mounted () {
-
+    // if the extension window stays open we are just listerning
+    // for alarms from background.js and fetching updated data from local storage
+    chrome.alarms.onAlarm.addListener(() => {
+      chrome.storage.local.get(['storage_cryptos', 'rates'], (data) => {
+        this.rates = data.rates
+        this.currencyOpts = Object.keys(data.rates)
+        this.cryptos = data.storage_cryptos
+        this.loaded = true
+      })
+    })
   },
-  methods: { //0 getmarketsummaries
+  methods: {
     fetchOrUpdate () {
       console.log("INSIDE FETCH");
       Promise.all([
         this.getCryptos(),
         this.getBtcPrice()]).then(data => {
         console.log(data);
-        return data; // many to assign o variable
+        return data;
 
       }).then(data => {
         var cryptos = []
@@ -106,7 +113,7 @@ export default {
         this.rates = data[1];
         this.currencyOpts = Object.keys(data[1])
         console.log("SETTING STORAGE_CRYPTOS AND TIMESTAMP");
-        chrome.storage.local.set({'storage_cryptos': data[0], 'rates': data[1], 'timestamp': (new Date).getTime() });
+        chrome.storage.local.set({ 'storage_cryptos': data[0], 'rates': data[1], 'timestamp': (new Date).getTime() });
         this.loaded = true;
 
       })
@@ -123,7 +130,7 @@ export default {
     },
     getBtcPrice () {
       return axios.get("https://blockchain.info/ticker").then((res) => {
-        return res.data//[res.data[currency].last, res.data[currency].symbol]
+        return res.data
       })
     },
     searchForCrypto (event) {
@@ -143,7 +150,45 @@ export default {
   },
   computed: {
     totalValue () {
-      return _.reduce(this.cryptos, (acc, crypto) => { return acc + (crypto.holdings * crypto.Last ) * this.currencyVal[0] }, 0)
+      // Not cool ...
+      var total = 0
+      var crates = {
+        ethbtc: {},
+        usdtbtc: {},
+        bnbbtc: {}
+      }
+      crates.ethbtc = _.find(this.cryptos, { symbol: "ETHBTC" })
+      crates.usdtbtc = _.find(this.cryptos, { symbol: "BTCUSDT" })
+      crates.bnbbtc = _.find(this.cryptos, { symbol: "BNBBTC" })
+
+      chrome.storage.local.get(['portfolio', 'rates'], (data) => {
+        _.each(data.portfolio, (c) => {
+          console.log(c);
+          if (c.id.endsWith("BTC")) {
+            total += c.holdings * data.rates[this.currency]["last"]
+            console.log("btc");
+            console.log(total);
+          }
+          if (c.id.endsWith("ETH")) {
+            total += c.holdings * crates.ethbtc.lastPrice * data.rates[this.currency]["last"]
+            console.log("ETH");
+            console.log(total);
+          }
+          if (c.id.endsWith("USDT")) {
+            total += c.holdings * crates.usdtbtc.lastPrice * data.rates[this.currency]["last"]
+            console.log("USDT");
+            console.log(total);
+          }
+          if (c.id.endsWith("BNB")) {
+            total += c.holdings * crates.bnbbtc.lastPrice * data.rates[this.currency]["last"]
+            console.log("BNB");
+            console.log(total);
+          }
+        })
+      })
+      console.log(total);
+      return total.toFixed(8)
+      // return _.reduce(data.portfolio, (acc, crypto) => { return acc + (crypto.holdings * crypto.Last ) * this.currencyVal[0] }, 0)
     },
     byVolume () {
       return _.sortBy(this.cryptos, (item) => { return item.Volume })
@@ -152,8 +197,8 @@ export default {
       return _.where(this.cryptos, { baseCurrency: "BTC" })
     },
     byTerm () {
-      return _.filter(this.byBaseCurrency, (crypto) => {
-        return crypto.MarketName.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1
+      return _.filter(this.cryptos, (crypto) => {
+        return crypto.symbol.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1
       })
     }
   },
@@ -167,7 +212,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
 
   color: #2c3e50;
-  width: 450px;
+  width: 370px;
   height: 600px;
   overflow-y: scroll;
 }

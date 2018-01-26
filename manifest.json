@@ -7,7 +7,6 @@
   "background": {
     "scripts": ["dist/build.js"]
   },
-  "about_page": "about.html",
   "browser_action": {
     "default_icon": "logo.png",
     "default_popup": "index.html"

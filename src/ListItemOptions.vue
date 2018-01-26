@@ -65,7 +65,7 @@ export default {
       console.log(this.portfolioItem);
       if (this.portfolioItem.notify_above <= 0 ||
          this.portfolioItem.notify_above == 'undefined') {
-        this.portfolioItem.notify_above = (this.crypto.Last + 0.00000001).toFixed(8)
+        this.portfolioItem.notify_above = (parseFloat(this.crypto.lastPrice) + 0.00000001).toFixed(8)
       }
     },
     setBelowDefault () {
@@ -73,20 +73,20 @@ export default {
       console.log(this.portfolioItem)
       if (this.portfolioItem.notify_below <= 0 ||
          this.portfolioItem.notify_below == 'undefined') {
-        this.portfolioItem.notify_below = (this.crypto.Last - 0.00000001).toFixed(8)
+        this.portfolioItem.notify_below = (parseFloat(this.crypto.lastPrice) - 0.00000001).toFixed(8)
       }
     },
     save () {
       console.log("as");
-
+      this.$emit('doneEditing')
       var portfolioItems = []
       chrome.storage.local.get('portfolio', (data) => {
         var exists = _.find(data.portfolio, (item) => {
-          return item.id == this.crypto.MarketName
+          return item.id == this.crypto.symbol
         })
         if (exists == undefined) {
           console.log("ADDING NEW");
-          data.portfolio.push(Object.assign(this.portfolioItem, {id: this.crypto.MarketName}))
+          data.portfolio.push(Object.assign(this.portfolioItem, {id: this.crypto.symbol}))
           chrome.storage.local.set(data)
         } else {
           console.log("UPDATING OLD");
@@ -108,13 +108,20 @@ export default {
 
   },
   mounted() {
-    let name = this.crypto.MarketName
+    let name = this.crypto.symbol
     chrome.storage.local.get('portfolio', (data) => {
-      let existing = _.find(data.portfolio, (item) => {
-        return item.id == name
-      })
-      this.portfolioItem = existing || Object.assign(this.portfolioItem, {id: this.crypto.MarketName})
+      if (typeof data.portfolio === 'undefined') {
+        chrome.storage.local.set({'portfolio': []})
+      } else {
+        let existing = _.find(data.portfolio, (item) => {
+          return item.id == name
+        })
+        this.portfolioItem = existing || Object.assign(this.portfolioItem, {id: this.crypto.symbol})
+      }
+
     })
+
+
   }
 
 }

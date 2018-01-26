@@ -1,31 +1,28 @@
 <template lang="html">
-  <li @click="showOptions()" >
+  <li @click="showOptions" >
     <div class="list-item">
-      <!-- <span class="list-item-section crypto-icon">
-        <img :src="crypto.logoUrl"/>
-      </span> -->
 
       <span class="list-item-section market-name">
-        <a @click="">{{crypto.symbol}}</a>
+        <a @click="">{{crypto.symbol}}</a><br/>
+        <strong v-bind:class="{ up: status.isUp, down: status.isDown, still: status.isStill }">
+          {{ percentDifference(crypto) }}
+        </strong>
       </span>
 
       <span class="list-item-section holdings">
         <span v-if="holdings > 0">
+          <small>
           {{holdings}}<br/>
-          {{holdings * crypto.lastPrice }}
+          {{(holdings * crypto.lastPrice) | toFixed8 }}
+          </small>
         </span>
       </span>
 
       <span class="list-item-section today-price">
         <small>
-
-          {{ this.rates[this.currency]["symbol"] }} {{ (crypto.lastPrice * this.rates[this.currency]["last"]) | toFixed4 }}
-
-          <strong v-bind:class="{ up: status.isUp, down: status.isDown, still: status.isStill }">
-            ({{ percentDifference(crypto) }})
-          </strong>
-        </small><br/>
-        <small>{{crypto.baseCurrency}} {{crypto.lastPrice }}</small>
+          {{ this.rates[this.currency]["symbol"] }} {{ calculatedPrice | toFixed4 }}<br/>
+          {{crypto.baseCurrency}} {{crypto.lastPrice }}
+        </small>
       </span>
     </div>
 
@@ -37,7 +34,7 @@
 <script>
 import ListItemOptions from './ListItemOptions.vue'
 export default {
-  props: ["crypto", "loaded", "currency", "rates"],
+  props: ["crypto", "loaded", "currency", "rates", "crates"],
   components: {
     ListItemOptions
   },
@@ -61,8 +58,23 @@ export default {
         return this.portfolioItem.holdings;
       }
     },
-    sb () {
-      return
+    calculatedPrice () {
+      var price = 0
+      if (this.crypto.symbol.endsWith("BTC")) {
+        price = this.crypto.lastPrice * this.rates[this.currency]["last"]
+      }
+      if (this.crypto.symbol.endsWith("ETH")) {
+        price = this.crates.ethbtc.lastPrice * this.crypto.lastPrice * this.rates[this.currency]["last"]
+      }
+      if (this.crypto.symbol.endsWith("USDT")) {
+        price = this.crates.usdtbtc.lastPrice * this.crypto.lastPrice * this.rates[this.currency]["last"]
+      }
+      if (this.crypto.symbol.endsWith("BNB")) {
+        price = this.crates.bnbbtc.lastPrice * this.crypto.lastPrice * this.rates[this.currency]["last"]
+      }
+
+      return price;
+
     }
   },
   mounted() {
@@ -76,12 +88,12 @@ export default {
 
   },
   methods: {
-    showOptions (event) {
+    showOptions () {
       this.isEditing = true
     },
-    hideOptions (value) {
-      // this.isEditing = false
-      console.log(value);
+    hideOptions () {
+      this.isEditing = !this.isEditing
+
     },
     openCryptoPage (url) {
       chrome.tabs.create({url: url});
