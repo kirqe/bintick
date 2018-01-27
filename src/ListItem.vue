@@ -1,9 +1,9 @@
 <template lang="html">
-  <li @click="showOptions" >
-    <div class="list-item">
+  <li>
+    <div class="list-item" @click="showOptions">
 
       <span class="list-item-section market-name">
-        <a @click="">{{crypto.symbol}}</a><br/>
+        <a @click="openCryptoPage">{{crypto.symbol}}</a><br/>
         <strong v-bind:class="{ up: status.isUp, down: status.isDown, still: status.isStill }">
           {{ percentDifference(crypto) }}
         </strong>
@@ -26,7 +26,7 @@
       </span>
     </div>
 
-    <list-item-options v-if="isEditing" :crypto="crypto" @doneEditing="hideOptions"></list-item-options>
+    <list-item-options v-if="isEditing" :crypto="crypto" @done="hideOptions"></list-item-options>
   </li>
 
 </template>
@@ -78,24 +78,29 @@ export default {
     }
   },
   mounted() {
-    let name = this.crypto.symbol
-    chrome.storage.local.get(['portfolio'], (data) => {
-      let existing = _.find(data.portfolio, (item) => {
-        return item.id == name
-      })
-      this.portfolioItem = existing
-    })
-
+    this.fetchPortFolioItem()
   },
   methods: {
+    fetchPortFolioItem () {
+      var name = this.crypto.symbol
+      chrome.storage.local.get(['portfolio'], (data) => {
+        var existing = _.find(data.portfolio, (item) => {
+          return item.id == name
+        })
+        this.portfolioItem = existing
+      })
+    },
     showOptions () {
-      this.isEditing = true
+      this.isEditing = !this.isEditing
+      console.log(`set ${this.isEditing}`);
     },
     hideOptions () {
-      this.isEditing = !this.isEditing
-
+      this.isEditing = false
+      console.log(`set ${this.isEditing}`);
+      this.fetchPortFolioItem()
     },
-    openCryptoPage (url) {
+    openCryptoPage () {
+      let url = `https://www.binance.com/trade.html?symbol=${this.crypto.symbol}`
       chrome.tabs.create({url: url});
     },
     percentDifference(crypto) {

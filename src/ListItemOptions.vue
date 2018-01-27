@@ -33,7 +33,7 @@
       <div class="control">
         <input type="checkbox" :id="portfolioItem.id" v-model="portfolioItem.notify">
         <label :for="portfolioItem.id">Show notifications</label>
-        <a class="button is-info is-small is-pulled-right" @click="save()">Save</a>
+        <a class="button is-info is-small is-pulled-right" @click="save">Save</a>
       </div>
     </div>
   </div>
@@ -78,7 +78,6 @@ export default {
     },
     save () {
       console.log("as");
-      this.$emit('doneEditing')
       var portfolioItems = []
       chrome.storage.local.get('portfolio', (data) => {
         var exists = _.find(data.portfolio, (item) => {
@@ -96,8 +95,8 @@ export default {
             }
             return item
           })
-          console.log(updatedData);
-           chrome.storage.local.set({ 'portfolio': updatedData })
+          chrome.storage.local.set({ 'portfolio': updatedData })
+          this.$emit('done')
         }
 
       })
