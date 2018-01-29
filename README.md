@@ -2,15 +2,18 @@
 
 > Crypto stats chrome extension with notifications and portfolio ish
 
-## Build Setup
+The value of cryptos that end with ETH, BNB, USDT are based on the values of BTC
+
+
+## Build
 
 ``` bash
-# install dependencies
-npm install
+yarn install
 
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
+yarn run build
 ```
+
+## Todo
+
+Probaly add vuex
+Fixes

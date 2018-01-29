@@ -12,7 +12,7 @@
       <label class="label is-small">Show notification when price is: </label>
       <div class="control">
         <input class="input is-small" type="number" :step="0.00000001" :min="0.00000000"
-        placeholder="above this value (btc)"
+        placeholder="above this value"
         v-model="portfolioItem.notify_above"
         @focus="setAboveDefault()">
       </div>
@@ -22,7 +22,7 @@
     <div class="field">
       <div class="control">
         <input class="input is-small" type="number" :step="0.00000001" :min="0.00000000"
-        placeholder="below this value (btc)"
+        placeholder="below this value"
         v-model="portfolioItem.notify_below"
         @focus="setBelowDefault()">
       </div>
@@ -45,18 +45,7 @@ export default {
   props: ["crypto"],
   data () {
     return {
-      portfolioItem: {
-        id: "",
-        holdings: 0,
-        notify: false,
-        notify_above: 'undefined',
-        notify_below: 'undefined'
-      }
-    }
-  },
-  computed: {
-    holdingsValue () {
-      // TODO: holdings * btcvalue * currency
+      portfolioItem: {}
     }
   },
   methods: {
@@ -77,7 +66,6 @@ export default {
       }
     },
     save () {
-      console.log("as");
       var portfolioItems = []
       chrome.storage.local.get('portfolio', (data) => {
         var exists = _.find(data.portfolio, (item) => {
@@ -85,8 +73,10 @@ export default {
         })
         if (exists == undefined) {
           console.log("ADDING NEW");
-          data.portfolio.push(Object.assign(this.portfolioItem, {id: this.crypto.symbol}))
-          chrome.storage.local.set(data)
+          var newData = data.portfolio
+          newData.push(Object.assign(this.portfolioItem, {id: this.crypto.symbol}))
+          chrome.storage.local.set({'portfolio': newData})
+          this.$emit('done')
         } else {
           console.log("UPDATING OLD");
           var updatedData = _.map(data.portfolio, (item) => {
@@ -98,13 +88,8 @@ export default {
           chrome.storage.local.set({ 'portfolio': updatedData })
           this.$emit('done')
         }
-
       })
-
-      // this.$emit('doneEditing', crypto)
-
     }
-
   },
   mounted() {
     let name = this.crypto.symbol
@@ -112,17 +97,11 @@ export default {
       if (typeof data.portfolio === 'undefined') {
         chrome.storage.local.set({'portfolio': []})
       } else {
-        let existing = _.find(data.portfolio, (item) => {
-          return item.id == name
-        })
+        let existing = _.find(data.portfolio, (item) => { return item.id == name })
         this.portfolioItem = existing || Object.assign(this.portfolioItem, {id: this.crypto.symbol})
       }
-
     })
-
-
   }
-
 }
 </script>
 

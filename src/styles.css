@@ -22,14 +22,14 @@
 .portfolio {
   width: 100%;
   position: absolute;
-  margin-top: 50px;
+  /* margin-top: 50px; */
   background-color: #209cee;
   /* margin-bottom: 50px; */
   z-index: 999;
 }
 
 .list-items-wrapper {
-  margin-top: 75px;
+  /* margin-top: 75px; */
 }
 
 .plr3 {

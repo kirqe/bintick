@@ -11,7 +11,12 @@
           <span class="list-item-section today-price">Price</span>
         </div>
       </li>
-      <list-item v-for="crypto in cryptos" :crypto="crypto" :currency="currency" :rates="rates" :crates="crates"></list-item>
+      <list-item v-for="crypto in cryptos"
+        :crypto="crypto"
+        :currency="currency"
+        :rates="rates"
+        :crypto_rates="crypto_rates"
+        :portfolio_items="portfolio_items"></list-item>
     </ul>
   </div>
 </template>
@@ -19,24 +24,9 @@
 <script>
 import ListItem from './ListItem.vue'
 export default {
-  props: ["cryptos", "loaded", "rates", "currency"],
+  props: ["cryptos", "loaded", "rates", "currency", "crypto_rates", "portfolio_items"],
   components: {
     ListItem
-  },
-  computed: {
-    crates() {
-      var crates = {
-        ethbtc: {},
-        usdtbtc: {},
-        bnbbtc: {}
-      }
-      crates.ethbtc = _.find(this.cryptos, { symbol: "ETHBTC" })
-      crates.usdtbtc = _.find(this.cryptos, { symbol: "BTCUSDT" })
-      crates.bnbbtc = _.find(this.cryptos, { symbol: "BNBBTC" })
-
-      console.log(crates);
-      return crates
-    }
   }
 }
 </script>

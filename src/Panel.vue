@@ -42,6 +42,7 @@ export default {
     setFilter() {
       this.activeOnly = !this.activeOnly
       chrome.storage.local.set({'activeOnly': this.activeOnly})
+      this.$emit('activeChanged')
     }
   },
   mounted () {
@@ -52,12 +53,11 @@ export default {
       } else {
         this.activeOnly = data.activeOnly
       }
-
     })
   },
   computed: {
     activeOnlyText() {
-      return (this.activeOnly == true) ? "Show only the cryptos that I own" : "Show all cryptos"
+      return (this.activeOnly == true) ? "Show all cryptos" : "Show only the cryptos that I own"
     }
   }
 }

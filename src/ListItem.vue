@@ -1,7 +1,6 @@
 <template lang="html">
   <li>
     <div class="list-item" @click="showOptions">
-
       <span class="list-item-section market-name">
         <a @click="openCryptoPage">{{crypto.symbol}}</a><br/>
         <strong v-bind:class="{ up: status.isUp, down: status.isDown, still: status.isStill }">
@@ -10,17 +9,17 @@
       </span>
 
       <span class="list-item-section holdings">
-        <span v-if="holdings > 0">
+        <span >
           <small>
-          {{holdings}}<br/>
-          {{(holdings * crypto.lastPrice) | toFixed8 }}
+          {{ holdings }}<br/>
+          {{ holdingsValue }}
           </small>
         </span>
       </span>
 
       <span class="list-item-section today-price">
         <small>
-          {{ this.rates[this.currency]["symbol"] }} {{ calculatedPrice | toFixed4 }}<br/>
+          ~ {{ this.rates[this.currency]["symbol"] }} {{ calculatedPrice }}<br/>
           {{crypto.baseCurrency}} {{crypto.lastPrice }}
         </small>
       </span>
@@ -28,13 +27,12 @@
 
     <list-item-options v-if="isEditing" :crypto="crypto" @done="hideOptions"></list-item-options>
   </li>
-
 </template>
 
 <script>
 import ListItemOptions from './ListItemOptions.vue'
 export default {
-  props: ["crypto", "loaded", "currency", "rates", "crates"],
+  props: ["crypto", "loaded", "currency", "rates", "crypto_rates", "portfolio_items"],
   components: {
     ListItemOptions
   },
@@ -55,8 +53,17 @@ export default {
         if (this.portfolioItem.holdings == 0) {
           return 0
         }
-        return this.portfolioItem.holdings;
+        return this.portfolioItem.holdings
       }
+    },
+    holdingsValue () {
+      if (_.has(this.portfolioItem, "holdings")) {
+        if (this.portfolioItem.holdings == 0) {
+          return 0
+        }
+        return (this.portfolioItem.holdings * this.crypto.lastPrice).toFixed(8)
+      }
+
     },
     calculatedPrice () {
       var price = 0
@@ -64,17 +71,22 @@ export default {
         price = this.crypto.lastPrice * this.rates[this.currency]["last"]
       }
       if (this.crypto.symbol.endsWith("ETH")) {
-        price = this.crates.ethbtc.lastPrice * this.crypto.lastPrice * this.rates[this.currency]["last"]
+        price = this.crypto_rates.ethbtc.lastPrice *
+                this.crypto.lastPrice *
+                this.rates[this.currency]["last"]
       }
       if (this.crypto.symbol.endsWith("USDT")) {
-        price = this.crates.usdtbtc.lastPrice * this.crypto.lastPrice * this.rates[this.currency]["last"]
+        price = this.crypto_rates.usdtbtc.lastPrice *
+                this.crypto.lastPrice *
+                this.rates[this.currency]["last"]
       }
       if (this.crypto.symbol.endsWith("BNB")) {
-        price = this.crates.bnbbtc.lastPrice * this.crypto.lastPrice * this.rates[this.currency]["last"]
+        price = this.crypto_rates.bnbbtc.lastPrice *
+                this.crypto.lastPrice *
+                this.rates[this.currency]["last"]
       }
 
-      return price;
-
+      return price.toFixed(4);
     }
   },
   mounted() {
@@ -82,12 +94,10 @@ export default {
   },
   methods: {
     fetchPortFolioItem () {
-      var name = this.crypto.symbol
-      chrome.storage.local.get(['portfolio'], (data) => {
-        var existing = _.find(data.portfolio, (item) => {
-          return item.id == name
+      chrome.storage.local.get('portfolio', (data) => {
+        this.portfolioItem = _.find(data.portfolio, (item) => {
+          return item.id == this.crypto.symbol
         })
-        this.portfolioItem = existing
       })
     },
     showOptions () {
@@ -95,9 +105,13 @@ export default {
       console.log(`set ${this.isEditing}`);
     },
     hideOptions () {
+      this.$emit('updatePortfolio')
+
+      this.fetchPortFolioItem()
+
       this.isEditing = false
       console.log(`set ${this.isEditing}`);
-      this.fetchPortFolioItem()
+
     },
     openCryptoPage () {
       let url = `https://www.binance.com/trade.html?symbol=${this.crypto.symbol}`
@@ -121,30 +135,19 @@ export default {
       }
       return `${decrease} %`
     }
-  },
-  filters: {
-    toFixed8(val) {
-      return val.toFixed(8)
-    },
-    toFixed4(val) {
-      return val.toFixed(4)
-    },
-    toFixed2(val) {
-      return val.toFixed(2)
-    }
   }
 }
 </script>
 
 <style lang="css">
   .market-name {
-    width: 20%;
+    width: 25%;
   }
   .today-price {
-    width: 40%;
+    width: 35%;
   }
   .holdings {
-    width: 40%;
+    width: 35%;
   }
   .up {
     color: #4caf50;
