@@ -2,18 +2,17 @@
   <div class="panel">
     <div class="field">
       <div class="control">
-        <a @click="setFilter" class="button is-success is-outlined">{{activeOnlyText}}</a>
-        <a @click="$emit('close')" class="button is-pulled-right">Close</a>
+        <a @click="setFilter" class="button is-small is-success is-outlined">{{activeOnlyText}}</a>
+        <a @click="$emit('close')" class="button is-small is-pulled-right">Close</a>
       </div>
     </div>
-
-    <br/>
+    <!-- <br/> -->
     <small>
       <b>What's this? </b><br/>
       Chrome extension for tracking cryptos<br/> with notifications support and some sort of<br/>
        portfolio functionality. <br/>
-      <!-- <a href="#" target="_blank">[source code]</a> -->
-      <br/>
+      <a href="https://github.com/kirqe/bintick" target="_blank">[source code yeee]</a>
+      <br/><br/>
       <b>Where do you get the data from? </b><br/>
       The extension fetches data directly from biance api.<br/> Why binance?<br/> Because it seems to be a really nice exchange.<br/>
       If you haven't registered yet here's my ref link :)<br/>

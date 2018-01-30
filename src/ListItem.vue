@@ -2,26 +2,32 @@
   <li>
     <div class="list-item" @click="showOptions">
       <span class="list-item-section market-name">
-        <a @click="openCryptoPage">{{crypto.symbol}}</a><br/>
-        <strong v-bind:class="{ up: status.isUp, down: status.isDown, still: status.isStill }">
-          {{ percentDifference(crypto) }}
-        </strong>
+        <small>
+          <a @click="openCryptoPage">
+            <strong>{{crypto.symbol}}</strong>
+          </a><br/>
+          <span class="x">={{this.crypto.lastPrice}}</span>
+        </small>
       </span>
 
       <span class="list-item-section holdings">
         <span >
           <small>
-          {{ holdings }}<br/>
-          {{ holdingsValue }}
+          <span v-if="holdingsValue > 0">{{ this.rates[this.currency]["symbol"] }}</span> {{ holdingsValue }}<br/>
+          {{ holdings }}
           </small>
         </span>
       </span>
 
       <span class="list-item-section today-price">
         <small>
-          ~ {{ this.rates[this.currency]["symbol"] }} {{ calculatedPrice }}<br/>
-          {{crypto.baseCurrency}} {{crypto.lastPrice }}
-        </small>
+          {{ this.rates[this.currency]["symbol"] }} {{ calculatedPrice }}</small><br/>
+          <strong v-bind:class="{ up: status.isUp,
+                                  down: status.isDown,
+                                  still: status.isStill }">
+            {{ percentDifference(crypto) }}
+          </strong>
+
       </span>
     </div>
 
@@ -61,9 +67,8 @@ export default {
         if (this.portfolioItem.holdings == 0) {
           return 0
         }
-        return (this.portfolioItem.holdings * this.crypto.lastPrice).toFixed(8)
+        return (this.portfolioItem.holdings * this.calculatedPrice).toFixed(4)
       }
-
     },
     calculatedPrice () {
       var price = 0
@@ -76,8 +81,8 @@ export default {
                 this.rates[this.currency]["last"]
       }
       if (this.crypto.symbol.endsWith("USDT")) {
-        price = this.crypto_rates.usdtbtc.lastPrice *
-                this.crypto.lastPrice *
+        price = (this.crypto.lastPrice / this.crypto_rates.usdtbtc.lastPrice) *
+
                 this.rates[this.currency]["last"]
       }
       if (this.crypto.symbol.endsWith("BNB")) {
@@ -141,7 +146,7 @@ export default {
 
 <style lang="css">
   .market-name {
-    width: 25%;
+    width: 30%;
   }
   .today-price {
     width: 35%;
@@ -149,13 +154,28 @@ export default {
   .holdings {
     width: 35%;
   }
+  .x {
+    font-size: 0.8em;
+  }
   .up {
-    color: #4caf50;
+    background-color: #4caf50;
+    padding: 2px 7px;
+    color: #fff;
+    border-radius: 3px;
+    font-size: 0.7em;
   }
   .down {
-    color: #f44336;
+    background-color: #f44336;
+    padding: 2px 7px;
+    color: #fff;
+    border-radius: 3px;
+    font-size: 0.7em;
   }
   .still {
-    color: #607d8b;
+    background-color: #607d8b;
+    padding: 2px 7px;
+    color: #fff;
+    border-radius: 3px;
+    font-size: 0.7em;
   }
 </style>

@@ -16,7 +16,7 @@
       <div class="is-pulled-right mlr3">
         <div class="control">
           <div class="select is-small">
-            <select v-model="currency">
+            <select v-model="currency" v-on:change="setCurrency">
               <option v-for="opt in currencyOpts">{{opt}}</option>
             </select>
           </div>
@@ -25,9 +25,9 @@
       <div class="is-clearfix"></div>
     </div>
 
-    <div class="portfolio">
-      <!-- <span class="tag is-info mlr3">Portfolio Value: {{totalValue}}</span> -->
-    </div>
+    <!-- <div class="portfolio">
+      <span class="tag is-info mlr3">Portfolio Value: {{totalValue}}</span>
+    </div> -->
 
     <panel @close="panel = false" @activeChanged = "setFilter" v-if="panel"></panel>
 
@@ -69,29 +69,22 @@ export default {
     }
   },
   beforeMount () {
-    if (navigator.onLine) {
-      this.fetchStorage()
+    // this is slow
         chrome.storage.local.get('timestamp', (data) => {
           if (typeof data.timestamp === 'undefined') {
             this.fetchOrUpdate()
           } else {
-            var range = (new Date).getTime() - data.timestamp
-            if (range >= 10000) {
-              this.fetchOrUpdate()
-            } else {
+
               this.fetchStorage()
-            }
+
           }
         })
-    } else {
-      this.fetchStorage()
-    }
+
   },
   mounted () {
     chrome.alarms.onAlarm.addListener(() => {
       this.fetchStorage()
     })
-
   },
   methods: {
     fetchOrUpdate () {
@@ -108,7 +101,7 @@ export default {
           var crypto_rates = {
             ethbtc: _.find(this.cryptos, { symbol: "ETHBTC" }),
             usdtbtc: _.find(this.cryptos, { symbol: "BTCUSDT" }),
-            bnbbtc: _.find(this.cryptos, { symbol: "BNBBTC" })
+            bnbbtc: _.find(this.cryptos, { symbol: "BNBBTC" }),
           }
           this.rates = data[1];
           this.crypto_rates = crypto_rates
@@ -124,11 +117,16 @@ export default {
         })
     },
     setFilter () {
-      this.fetchOrUpdate()
+      this.fetchStorage()
       this.panel = false
     },
+    setCurrency() {
+      chrome.storage.local.set({'currency': this.currency})
+      this.fetchStorage()
+    },
     fetchStorage () {
-      chrome.storage.local.get(['storage_cryptos', 'rates', 'portfolio', 'crypto_rates', 'activeOnly'], (data) => {
+      chrome.storage.local.get(['storage_cryptos', 'rates', 'portfolio', 'crypto_rates', 'activeOnly', 'currency'], (data) => {
+        this.currency = data.currency || 'USD'
         this.rates = data.rates
         this.currencyOpts = Object.keys(data.rates)
         this.cryptos = data.storage_cryptos
@@ -159,12 +157,7 @@ export default {
                   return c.symbol == p.id;
                 })
               })
-
-
       }
-      new Promise(function(resolve, reject) {
-
-      });
 
       return _.filter(res, (crypto) => {
         return crypto.symbol.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1
