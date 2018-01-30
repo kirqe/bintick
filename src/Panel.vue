@@ -2,17 +2,16 @@
   <div class="panel">
     <div class="field">
       <div class="control">
-        <a @click="setFilter" class="button is-small is-success is-outlined">{{activeOnlyText}}</a>
-        <a @click="$emit('close')" class="button is-small is-pulled-right">Close</a>
+        <a @click="setFilter" class="button is-success is-outlined">{{activeOnlyText}}</a>
+        <a @click="$emit('close')" class="button is-pulled-right">Close</a>
       </div>
     </div>
-    <!-- <br/> -->
+    <br/>
     <small>
       <b>What's this? </b><br/>
       Chrome extension for tracking cryptos<br/> with notifications support and some sort of<br/>
-       portfolio functionality. <br/>
-      <a href="https://github.com/kirqe/bintick" target="_blank">[source code yeee]</a>
-      <br/><br/>
+       portfolio functionality. <a href="https://github.com/kirqe/bintick" target="_blank">[source]</a><br/>
+      <br/>
       <b>Where do you get the data from? </b><br/>
       The extension fetches data directly from biance api.<br/> Why binance?<br/> Because it seems to be a really nice exchange.<br/>
       If you haven't registered yet here's my ref link :)<br/>
@@ -67,7 +66,6 @@ export default {
     height: 600px;
     display: block;
     background: #fff;
-    /* height: 100%; */
     width: 100%;
     top: 0;
     position: relative;
@@ -76,9 +74,7 @@ export default {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
     color: #2c3e50;
-
     font-size: 0.8em;
     padding: 10px;
     border: 3px solid #209cee;

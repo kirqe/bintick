@@ -107,16 +107,10 @@ export default {
     },
     showOptions () {
       this.isEditing = !this.isEditing
-      console.log(`set ${this.isEditing}`);
     },
     hideOptions () {
-      this.$emit('updatePortfolio')
-
       this.fetchPortFolioItem()
-
       this.isEditing = false
-      console.log(`set ${this.isEditing}`);
-
     },
     openCryptoPage () {
       let url = `https://www.binance.com/trade.html?symbol=${this.crypto.symbol}`

@@ -3,7 +3,7 @@
     <div class="field">
       <label class="label is-small">Holdings:</label>
       <div class="control">
-        <input class="input is-small" v-model="portfolioItem.holdings" type="number" placeholder="Quantity">
+        <input class="input is-small" v-model="portfolioItem.holdings" type="number" placeholder="Quantity" :min="0.00000000">
       </div>
       <!-- <p class="help">This is a help text</p> -->
     </div>
@@ -12,7 +12,7 @@
       <label class="label is-small">Show notification when price is: </label>
       <div class="control">
         <input class="input is-small" type="number" :step="0.00000001" :min="0.00000000"
-        placeholder="above this value"
+        placeholder="above this value (base crypto)"
         v-model="portfolioItem.notify_above"
         @focus="setAboveDefault()">
       </div>
@@ -22,7 +22,7 @@
     <div class="field">
       <div class="control">
         <input class="input is-small" type="number" :step="0.00000001" :min="0.00000000"
-        placeholder="below this value"
+        placeholder="below this value (base crypto)"
         v-model="portfolioItem.notify_below"
         @focus="setBelowDefault()">
       </div>
@@ -45,24 +45,25 @@ export default {
   props: ["crypto"],
   data () {
     return {
-      portfolioItem: {}
+      portfolioItem: {
+        holdings: 0,
+        notify: false,
+        notify_above: 'undefined',
+        notify_below: 'undefined'
+      }
     }
   },
   methods: {
     setAboveDefault () {
-      console.log("set above");
-      console.log(this.portfolioItem);
       if (this.portfolioItem.notify_above <= 0 ||
-         this.portfolioItem.notify_above == 'undefined') {
-        this.portfolioItem.notify_above = (parseFloat(this.crypto.lastPrice) + 0.00000001).toFixed(8)
+          this.portfolioItem.notify_above == 'undefined') {
+            this.portfolioItem.notify_above = (parseFloat(this.crypto.lastPrice) + 0.00000001).toFixed(8)
       }
     },
     setBelowDefault () {
-      console.log("set below");
-      console.log(this.portfolioItem)
       if (this.portfolioItem.notify_below <= 0 ||
-         this.portfolioItem.notify_below == 'undefined') {
-        this.portfolioItem.notify_below = (parseFloat(this.crypto.lastPrice) - 0.00000001).toFixed(8)
+          this.portfolioItem.notify_below == 'undefined') {
+            this.portfolioItem.notify_below = (parseFloat(this.crypto.lastPrice) - 0.00000001).toFixed(8)
       }
     },
     save () {
@@ -71,20 +72,23 @@ export default {
         var exists = _.find(data.portfolio, (item) => {
           return item.id == this.crypto.symbol
         })
-        if (exists == undefined) {
-          console.log("ADDING NEW");
+        if (typeof exists === 'undefined') {
+          // add new
           var newData = data.portfolio
           newData.push(Object.assign(this.portfolioItem, {id: this.crypto.symbol}))
           chrome.storage.local.set({'portfolio': newData})
           this.$emit('done')
         } else {
-          console.log("UPDATING OLD");
+          // update old
           var updatedData = _.map(data.portfolio, (item) => {
             if (item.id == exists.id) {
               item = Object.assign(item, this.portfolioItem)
             }
             return item
           })
+          updatedData = _.reject(updatedData, (ud) => {
+            return ((ud.holdings == 0 || ud.holdings == 'undefined') && ud.notify == false)
+            })
           chrome.storage.local.set({ 'portfolio': updatedData })
           this.$emit('done')
         }

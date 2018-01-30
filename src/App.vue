@@ -31,7 +31,7 @@
 
     <panel @close="panel = false" @activeChanged = "setFilter" v-if="panel"></panel>
 
-    <list-items v-if="!panel"
+    <list-items v-if="!panel && filteredCryptos"
                       :cryptos="filteredCryptos"
                       :loaded="loaded"
                       :currency="currency"
@@ -65,31 +65,28 @@ export default {
       currencyOpts: ['USD', 'EUR', 'CNY', 'GBP', 'RUB'],
       loaded: false,
       activeOnly: false,
-      panel: false
+      panel: false,
+      timestamp: null
     }
   },
   beforeMount () {
-    // this is slow
-        chrome.storage.local.get('timestamp', (data) => {
-          if (typeof data.timestamp === 'undefined') {
-            this.fetchOrUpdate()
-          } else {
-
-              this.fetchStorage()
-
-          }
-        })
 
   },
   mounted () {
+    this.fetchStorage()
+    chrome.storage.local.get('timestamp', (data) => {
+      if (typeof data.timestamp === 'undefined') {
+        this.fetchOrUpdate()
+      } else {
+        this.fetchStorage()
+      }
+    })
     chrome.alarms.onAlarm.addListener(() => {
       this.fetchStorage()
     })
   },
   methods: {
     fetchOrUpdate () {
-      console.log("INSIDE FETCH");
-      this.fetchStorage()
       Promise.all([
         this.getCryptos(),
         this.getBtcPrice()]).then((data) => {
@@ -106,7 +103,6 @@ export default {
           this.rates = data[1];
           this.crypto_rates = crypto_rates
           this.currencyOpts = Object.keys(data[1])
-          console.log("SETTING STORAGE_CRYPTOS AND TIMESTAMP");
           chrome.storage.local.set({
             'storage_cryptos': data[0],
             'rates': data[1],
@@ -114,6 +110,8 @@ export default {
             'timestamp': (new Date).getTime()
           });
           this.loaded = true;
+        }).then(()=>{
+          this.fetchStorage()
         })
     },
     setFilter () {
@@ -125,19 +123,19 @@ export default {
       this.fetchStorage()
     },
     fetchStorage () {
-      chrome.storage.local.get(['storage_cryptos', 'rates', 'portfolio', 'crypto_rates', 'activeOnly', 'currency'], (data) => {
+      chrome.storage.local.get(['storage_cryptos', 'rates', 'portfolio', 'crypto_rates', 'activeOnly', 'currency', 'timestamp'], (data) => {
         this.currency = data.currency || 'USD'
         this.rates = data.rates
-        this.currencyOpts = Object.keys(data.rates)
+        this.currencyOpts = _.keys(data.rates)
         this.cryptos = data.storage_cryptos
         this.crypto_rates = data.crypto_rates
         this.portfolio = data.portfolio
         this.activeOnly = data.activeOnly
+        this.timestamp = data.timestamp
         this.loaded = true
       })
     },
     getCryptos () {
-      console.log("HITTING BINANCE");
       return axios.get("https://api.binance.com/api/v1/ticker/24hr").then((res) => {
         return _.sortBy(res.data, (item) => { return item.symbol })
       })

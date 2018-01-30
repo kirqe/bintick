@@ -12,7 +12,6 @@ import App from './App.vue'
 import Styles from './styles.css'
 window.background = require('../background');
 
-// require('../background.js')
 
 new Vue({
   el: '#app',

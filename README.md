@@ -1,9 +1,10 @@
-# cryptoticker
+# Bintick
 
-> Crypto stats chrome extension with notifications and portfolio ish
+> Chrome extension for tracking crypto stats from binance
 
-The value of cryptos that end with ETH, BNB, USDT are based on the values of BTC
+The value of cryptos that end with ETH, BNB, USDT are based on the values of BTC.
 
+Data get updated every minute.
 
 ## Build
 

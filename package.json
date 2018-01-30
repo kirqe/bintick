@@ -1,6 +1,6 @@
 {
-  "name": "cryptoticker",
-  "description": "Crypto stats chrome extension",
+  "name": "Bintick",
+  "description": "Chrome extension for tracking crypto stats from binance",
   "author": "kirqe <railsr@yahoo.com>",
   "private": true,
   "scripts": {
