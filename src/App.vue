@@ -106,11 +106,12 @@ export default {
           chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'activeOnly', 'currency', 'ts'], (data) => {
             this.ts = data.ts
             this.activeOnly = data.activeOnly || false
-            // this.currency = data.currency
+
             if (typeof data.storage_cryptos === 'undefined') {
-              chrome.storage.local.set({'storage_cryptos': this.cryptos, 'rates': this.rates, 'crypto_rates': this.crypto_rates})
+              chrome.storage.local.set({'storage_cryptos': this.cryptos, 'rates': this.rates, 'crypto_rates': this.crypto_rates, currency: this.currency})
               this.fetchOrUpdate()
             } else {
+              this.currency = data.currency
               this.cryptos = _.map(_.groupBy(_.union(this.cryptos, data.storage_cryptos), "symbol"), (item) => {
                 return _.extendOwn(item[0], _.omit(item[1], 'portfolio'))
               })
