@@ -64,24 +64,26 @@ export default {
       currencyOpts: ['USD', 'EUR', 'CNY', 'GBP', 'RUB'],
       loaded: false,
       activeOnly: false,
-      panel: false
+      panel: false,
+      ts: null
     }
   },
-  beforeMount () {
-
-  },
   mounted () {
-    // this.fetchStorage()
-    this.fetchOrUpdate()
-    // chrome.alarms.onAlarm.addListener(() => {
-    //   console.log("2");
-    //   chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'currency'], (data) => {
-    //     console.log("3");
-    //     this.cryptos = data.storage_cryptos
-    //     this.rates = data.rates
-    //     this.crypto_rates = data.crypto_rates
-    //   })
-    // })
+    chrome.storage.local.get('ts', (data) => {
+      if (new Date().getTime() - data.ts <= 10000) {
+        this.fetchStorage()
+      } else {
+        this.fetchOrUpdate()
+      }
+    })
+
+    chrome.alarms.onAlarm.addListener(() => {
+      chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'currency'], (data) => {
+        this.cryptos = data.storage_cryptos
+        this.rates = data.rates
+        this.crypto_rates = data.crypto_rates
+      })
+    })
   },
   methods: {
     fetchOrUpdate () {
@@ -101,7 +103,8 @@ export default {
             bnbbtc: _.find(data[0], { symbol: "BNBBTC" }),
           }
           this.cryptos = data[0]
-          chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'activeOnly', 'currency'], (data) => {
+          chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'activeOnly', 'currency', 'ts'], (data) => {
+            this.ts = data.ts
             this.activeOnly = data.activeOnly || false
             // this.currency = data.currency
             if (typeof data.storage_cryptos === 'undefined') {
@@ -113,8 +116,8 @@ export default {
               })
               this.cryptos = data.storage_cryptos
             }
-
           })
+          chrome.storage.local.set({'ts': new Date().getTime()})
           this.loaded = true;
         })
 
@@ -130,11 +133,9 @@ export default {
     fetchStorage () {
       chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'activeOnly', 'currency'], (data) => {
         this.cryptos = data.storage_cryptos
-
         this.currency = data.currency || 'USD'
         this.rates = data.rates
         this.currencyOpts = _.keys(data.rates)
-
         this.crypto_rates = data.crypto_rates
         this.activeOnly = data.activeOnly
         this.loaded = true
@@ -201,6 +202,4 @@ export default {
 	background-color: #000000;
 	border: 2px solid #555555;
 }
-
-
 </style>

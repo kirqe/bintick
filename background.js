@@ -1,9 +1,7 @@
-chrome.alarms.create('check_price', { delayInMinutes: 0.5, periodInMinutes: 0.5});
+chrome.alarms.create('check_price', { delayInMinutes: 1, periodInMinutes: 1});
 
 var getCryptos = () => {
-  console.log("BG get ");
   return axios.get("https://api.binance.com/api/v1/ticker/24hr").then((res) => {
-
     return res.data
   })
 }
@@ -24,20 +22,15 @@ var fetchNewData = () => {
       bnbbtc: _.find(data[0], { symbol: "BNBBTC" }),
     }
 
-    var new_cryptos = data[0]
-    var new_rates = data[1]
+  var new_cryptos = data[0]
+  var new_rates = data[1]
 
-
-    chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates'], (data) => {
-        var cryptosToSave = _.map(_.groupBy(_.union(data.storage_cryptos, new_cryptos), "symbol"), (item) => {
-          return _.extendOwn(item[0], item[1])
-
-        })
-        chrome.storage.local.set({'storage_cryptos': cryptosToSave, 'rates': new_rates, 'crypto_rates': crypto_rates }) })
+  chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates'], (data) => {
+    var cryptosToSave = _.map(_.groupBy(_.union(data.storage_cryptos, new_cryptos), "symbol"), (item) => {
+      return _.extendOwn(item[0], item[1])
     })
-
-
-
+    chrome.storage.local.set({'storage_cryptos': cryptosToSave, 'rates': new_rates, 'crypto_rates': crypto_rates }) })
+  })
 }
 
 var calcPrice = (crypto, data) => {
