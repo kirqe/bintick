@@ -31,13 +31,12 @@
 
     <panel @close="panel = false" @activeChanged = "setFilter" v-if="panel"></panel>
 
-    <list-items v-if="!panel && filteredCryptos"
+    <list-items v-if="!panel"
                       :cryptos="filteredCryptos"
                       :loaded="loaded"
                       :currency="currency"
                       :rates="rates"
-                      :crypto_rates="crypto_rates"
-                      :portfolio_items="portfolio"></list-items>
+                      :crypto_rates="crypto_rates"></list-items>
 
   </div>
 </template>
@@ -65,54 +64,60 @@ export default {
       currencyOpts: ['USD', 'EUR', 'CNY', 'GBP', 'RUB'],
       loaded: false,
       activeOnly: false,
-      panel: false,
-      timestamp: null
+      panel: false
     }
   },
   beforeMount () {
 
   },
   mounted () {
-    this.fetchStorage()
-    chrome.storage.local.get('timestamp', (data) => {
-      if (typeof data.timestamp === 'undefined') {
-        this.fetchOrUpdate()
-      } else {
-        this.fetchStorage()
-      }
-    })
-    chrome.alarms.onAlarm.addListener(() => {
-      this.fetchStorage()
-    })
+    // this.fetchStorage()
+    this.fetchOrUpdate()
+    // chrome.alarms.onAlarm.addListener(() => {
+    //   console.log("2");
+    //   chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'currency'], (data) => {
+    //     console.log("3");
+    //     this.cryptos = data.storage_cryptos
+    //     this.rates = data.rates
+    //     this.crypto_rates = data.crypto_rates
+    //   })
+    // })
   },
   methods: {
     fetchOrUpdate () {
-      Promise.all([
-        this.getCryptos(),
-        this.getBtcPrice()]).then((data) => {
+      Promise.all([this.getCryptos(), this.getBtcPrice()])
+        .then((data) => {
           return data;
-        }).then(data => {
-          var cryptos = []
-          this.loaded = false;
-          this.cryptos = data[0];
-          var crypto_rates = {
-            ethbtc: _.find(this.cryptos, { symbol: "ETHBTC" }),
-            usdtbtc: _.find(this.cryptos, { symbol: "BTCUSDT" }),
-            bnbbtc: _.find(this.cryptos, { symbol: "BNBBTC" }),
-          }
-          this.rates = data[1];
-          this.crypto_rates = crypto_rates
-          this.currencyOpts = Object.keys(data[1])
-          chrome.storage.local.set({
-            'storage_cryptos': data[0],
-            'rates': data[1],
-            'crypto_rates': crypto_rates,
-            'timestamp': (new Date).getTime()
-          });
-          this.loaded = true;
-        }).then(()=>{
-          this.fetchStorage()
         })
+        .then(data => {
+          var cryptos = []
+          this.loaded = false
+          this.currency = "USD"
+          this.currencyOpts = _.keys(data[1])
+          this.rates = data[1];
+          this.crypto_rates = {
+            ethbtc: _.find(data[0], { symbol: "ETHBTC" }),
+            usdtbtc: _.find(data[0], { symbol: "BTCUSDT" }),
+            bnbbtc: _.find(data[0], { symbol: "BNBBTC" }),
+          }
+          this.cryptos = data[0]
+          chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'activeOnly', 'currency'], (data) => {
+            this.activeOnly = data.activeOnly || false
+            // this.currency = data.currency
+            if (typeof data.storage_cryptos === 'undefined') {
+              chrome.storage.local.set({'storage_cryptos': this.cryptos, 'rates': this.rates, 'crypto_rates': this.crypto_rates})
+              this.fetchOrUpdate()
+            } else {
+              this.cryptos = _.map(_.groupBy(_.union(this.cryptos, data.storage_cryptos), "symbol"), (item) => {
+                return _.extendOwn(item[0], _.omit(item[1], 'portfolio'))
+              })
+              this.cryptos = data.storage_cryptos
+            }
+
+          })
+          this.loaded = true;
+        })
+
     },
     setFilter () {
       this.fetchStorage()
@@ -123,21 +128,23 @@ export default {
       this.fetchStorage()
     },
     fetchStorage () {
-      chrome.storage.local.get(['storage_cryptos', 'rates', 'portfolio', 'crypto_rates', 'activeOnly', 'currency', 'timestamp'], (data) => {
+      chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'activeOnly', 'currency'], (data) => {
+        this.cryptos = data.storage_cryptos
+
         this.currency = data.currency || 'USD'
         this.rates = data.rates
         this.currencyOpts = _.keys(data.rates)
-        this.cryptos = data.storage_cryptos
+
         this.crypto_rates = data.crypto_rates
-        this.portfolio = data.portfolio
         this.activeOnly = data.activeOnly
-        this.timestamp = data.timestamp
         this.loaded = true
       })
     },
     getCryptos () {
       return axios.get("https://api.binance.com/api/v1/ticker/24hr").then((res) => {
-        return _.sortBy(res.data, (item) => { return item.symbol })
+        console.log("HITTING");
+        var prt = { portfolio: { holdings: 0, notify: false, notify_above: null, notify_below: null } }
+        return _.map(res.data, (item) => { return _.extend(item, prt)})
       })
     },
     getBtcPrice () {
@@ -148,13 +155,13 @@ export default {
   },
   computed: {
     filteredCryptos () {
-      var res = this.cryptos
+      var res = []
       if (this.activeOnly) {
         res = _.filter(this.cryptos, (c) => {
-                return _.find(this.portfolio, (p) => {
-                  return c.symbol == p.id;
-                })
+                return c.portfolio.holdings > 0
               })
+      } else {
+        res = this.cryptos
       }
 
       return _.filter(res, (crypto) => {

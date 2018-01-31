@@ -11,9 +11,9 @@
       </span>
 
       <span class="list-item-section holdings">
-        <span >
+        <span v-if="holdingsValue > 0">
           <small>
-          <span v-if="holdingsValue > 0">{{ this.rates[this.currency]["symbol"] }}</span> {{ holdingsValue }}<br/>
+          <span>{{ this.rates[this.currency]["symbol"] }}</span> {{ holdingsValue }}<br/>
           {{ holdings }}
           </small>
         </span>
@@ -38,7 +38,7 @@
 <script>
 import ListItemOptions from './ListItemOptions.vue'
 export default {
-  props: ["crypto", "loaded", "currency", "rates", "crypto_rates", "portfolio_items"],
+  props: ["crypto", "loaded", "currency", "rates", "crypto_rates"],
   components: {
     ListItemOptions
   },
@@ -55,19 +55,19 @@ export default {
   },
   computed: {
     holdings () {
-      if (_.has(this.portfolioItem, "holdings")) {
-        if (this.portfolioItem.holdings == 0) {
+      if (_.has(this.crypto.portfolio, "holdings")) {
+        if (this.crypto.portfolio.holdings == 0) {
           return 0
         }
-        return this.portfolioItem.holdings
+        return this.crypto.portfolio.holdings
       }
     },
     holdingsValue () {
-      if (_.has(this.portfolioItem, "holdings")) {
-        if (this.portfolioItem.holdings == 0) {
+      if (_.has(this.crypto.portfolio, "holdings")) {
+        if (this.crypto.portfolio.holdings == 0) {
           return 0
         }
-        return (this.portfolioItem.holdings * this.calculatedPrice).toFixed(4)
+        return (this.crypto.portfolio.holdings * this.calculatedPrice).toFixed(4)
       }
     },
     calculatedPrice () {
@@ -94,22 +94,12 @@ export default {
       return price.toFixed(4);
     }
   },
-  mounted() {
-    this.fetchPortFolioItem()
-  },
   methods: {
-    fetchPortFolioItem () {
-      chrome.storage.local.get('portfolio', (data) => {
-        this.portfolioItem = _.find(data.portfolio, (item) => {
-          return item.id == this.crypto.symbol
-        })
-      })
-    },
     showOptions () {
       this.isEditing = !this.isEditing
     },
     hideOptions () {
-      this.fetchPortFolioItem()
+      // this.fetchPortFolioItem()
       this.isEditing = false
     },
     openCryptoPage () {

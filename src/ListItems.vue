@@ -24,7 +24,7 @@
 <script>
 import ListItem from './ListItem.vue'
 export default {
-  props: ["cryptos", "loaded", "rates", "currency", "crypto_rates", "portfolio_items"],
+  props: ["cryptos", "loaded", "rates", "currency", "crypto_rates"],
   components: {
     ListItem
   }
