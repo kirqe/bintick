@@ -59,7 +59,13 @@ var calcPrice = (crypto, data) => {
   return fvalue.toFixed(4)
 }
 
-var createNotification = (item, direction, value, curr, fvalue) => {
+var createNotification = (item, direction, curr, fvalue) => {
+  var value = ""
+  if (direction == "above") {
+    value = item.portfolio.notify_above
+  } else {
+    value = item.portfolio.notify_below
+  }
   chrome.notifications.create(
     {
       type: "basic",
@@ -76,29 +82,20 @@ chrome.alarms.onAlarm.addListener((alarm) => {
         var watch_items = _.filter(data.storage_cryptos, (item) => {
               return item.portfolio.notify == true
             })
-        var watch_markets = _.map(_.filter(data.storage_cryptos, (p) => {
-              return p.portfolio.notify == true
-            }), (x) => { return x.symbol })
-
-        var new_items = _.filter(data.storage_cryptos, (new_item) => {
-          return _.contains(watch_markets, new_item.symbol)
-        })
 
         for(var i = 0; i < watch_items.length; i++) {
-          if (watch_items[i].portfolio.notify_above == 'undefined') {
+          if (typeof watch_items[i].portfolio.notify_above === 'undefined') {
             return
-          } else if (new_items[i].lastPrice > watch_items[i].notify_above) {
-            fvalue = calcPrice(new_items[i], data)
-            createNotification(new_items[i], "above",
-              watch_items[i].portfolio.notify_above, data.rates[data.currency]["symbol"], fvalue)
+          } else if (watch_items[i].lastPrice > watch_items[i].portfolio.notify_above) {
+            fvalue = calcPrice(watch_items[i], data)
+            createNotification(watch_items[i], "above", data.rates[data.currency]["symbol"], fvalue)
           }
 
           if (watch_items[i].portfolio.notify_below == 'undefined') {
             return
-          } else if (new_items[i].lastPrice < watch_items[i].portfolio.notify_below) {
-            fvalue = calcPrice(new_items[i], data)
-            createNotification(new_items[i], "below",
-              watch_items[i].portfolio.notify_below, data.rates[data.currency]["symbol"], fvalue)
+          } else if (watch_items[i].lastPrice < watch_items[i].portfolio.notify_below) {
+            fvalue = calcPrice(watch_items[i], data)
+            createNotification(watch_items[i], "below", data.rates[data.currency]["symbol"], fvalue)
           }
         }
       })
