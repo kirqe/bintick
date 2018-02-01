@@ -1,4 +1,4 @@
-@import '../node_modules/bulma/css/bulma.css';
+@import url('../node_modules/bulma/css/bulma.css');
 
 .header-panel {
   background: #f8f8f8;

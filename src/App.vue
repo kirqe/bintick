@@ -56,7 +56,6 @@ export default {
   data () {
     return {
       cryptos: [],
-      portfolio: [],
       rates: [],
       crypto_rates: [],
       searchTerm: '',
@@ -69,21 +68,24 @@ export default {
     }
   },
   mounted () {
-    chrome.storage.local.get('ts', (data) => {
-      if (new Date().getTime() - data.ts <= 10000) {
-        this.fetchStorage()
-      } else {
-        this.fetchOrUpdate()
-      }
-    })
-
-    chrome.alarms.onAlarm.addListener(() => {
-      chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'currency'], (data) => {
-        this.cryptos = data.storage_cryptos
-        this.rates = data.rates
-        this.crypto_rates = data.crypto_rates
+    if (navigator.onLine) {
+      chrome.storage.local.get('ts', (data) => {
+        if (new Date().getTime() - data.ts <= 10000) {
+          this.fetchStorage()
+        } else {
+          this.fetchOrUpdate()
+        }
       })
-    })
+      chrome.alarms.onAlarm.addListener(() => {
+        chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'currency'], (data) => {
+          this.cryptos = data.storage_cryptos
+          this.rates = data.rates
+          this.crypto_rates = data.crypto_rates
+        })
+      })
+    } else {
+      this.fetchStorage()
+    }
   },
   methods: {
     fetchOrUpdate () {
@@ -133,11 +135,13 @@ export default {
     },
     fetchStorage () {
       chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates', 'activeOnly', 'currency'], (data) => {
-        this.cryptos = data.storage_cryptos
-        this.currency = data.currency || 'USD'
         this.rates = data.rates
         this.currencyOpts = _.keys(data.rates)
         this.crypto_rates = data.crypto_rates
+        this.currency = data.currency || 'USD'
+        this.cryptos = data.storage_cryptos
+
+
         this.activeOnly = data.activeOnly
         this.loaded = true
       })
