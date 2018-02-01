@@ -148,7 +148,6 @@ export default {
     },
     getCryptos () {
       return axios.get("https://api.binance.com/api/v1/ticker/24hr").then((res) => {
-        console.log("HITTING");
         var prt = { portfolio: { holdings: 0, notify: false, notify_above: null, notify_below: null } }
         return _.map(res.data, (item) => { return _.extend(item, prt)})
       })
