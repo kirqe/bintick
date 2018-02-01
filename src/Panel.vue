@@ -10,7 +10,7 @@
     <small>
       <b>What's this? </b><br/>
       Chrome extension for tracking cryptos<br/> with notifications support and some sort of<br/>
-       portfolio functionality. <a href="https://github.com/kirqe/bintick" target="_blank">[source]</a><br/>
+       portfolio functionality. <a href="https://github.com/kirqe/bintick" target="_blank">[source code]</a><br/>
       <br/>
       <b>Where do you get the data from? </b><br/>
       The extension fetches data directly from biance api.<br/> Why binance?<br/> Because it seems to be a really nice exchange.<br/>
@@ -22,7 +22,7 @@
       LTC: LP5wEmKc7vjTKAwkbU4fJeMFUhE8pCmbHo<br/>
       ZEC: t1bym8jLN25iAHxnkmU96kUTaPpcu4XMwXv<br/>
       XRP: rNKBi8ZPTGgBytZokUhT3QYWabrTtZSVjy<br/>
-      XVG: DJiKRUWzdaQyhJtnrFjvTa7Tqyufnt2gKE<br/>
+      XVG: DHfHMRYtvVQkrm4dFdrRcSLcn4x25nFEXP<br/>
     </small>
     <br/>
     <span style="color: #e25555;">&#9829;</span>

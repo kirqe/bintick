@@ -111,7 +111,7 @@ export default {
 
             if (typeof data.storage_cryptos === 'undefined') {
               chrome.storage.local.set({'storage_cryptos': this.cryptos, 'rates': this.rates, 'crypto_rates': this.crypto_rates, currency: this.currency})
-              this.fetchOrUpdate()
+              // this.fetchOrUpdate()
             } else {
               this.currency = data.currency
               this.cryptos = _.map(_.groupBy(_.union(this.cryptos, data.storage_cryptos), "symbol"), (item) => {
@@ -123,7 +123,6 @@ export default {
           chrome.storage.local.set({'ts': new Date().getTime()})
           this.loaded = true;
         })
-
     },
     setFilter () {
       this.fetchStorage()
@@ -140,8 +139,6 @@ export default {
         this.crypto_rates = data.crypto_rates
         this.currency = data.currency || 'USD'
         this.cryptos = data.storage_cryptos
-
-
         this.activeOnly = data.activeOnly
         this.loaded = true
       })
@@ -163,7 +160,9 @@ export default {
       var res = []
       if (this.activeOnly) {
         res = _.filter(this.cryptos, (c) => {
-                return c.portfolio.holdings > 0
+                if (typeof c.portfolio !== 'undefined') {
+                  return c.portfolio.holdings > 0 || c.portfolio.notify
+                }
               })
       } else {
         res = this.cryptos

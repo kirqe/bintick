@@ -15,8 +15,7 @@
         :crypto="crypto"
         :currency="currency"
         :rates="rates"
-        :crypto_rates="crypto_rates"
-        :portfolio_items="portfolio_items"></list-item>
+        :crypto_rates="crypto_rates"></list-item>
     </ul>
   </div>
 </template>
