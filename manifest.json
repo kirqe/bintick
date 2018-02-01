@@ -18,7 +18,8 @@
     "storage",
     "notifications",
     "alarms",
-    "https://api.binance.com/"
+    "https://api.binance.com/api/v1/ticker/24hr",
+    "https://blockchain.info/ticker"
   ],
   "web_accessible_resources": [
     "loader.gif"
