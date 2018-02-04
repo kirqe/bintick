@@ -44,7 +44,6 @@ export default {
   },
   data () {
     return {
-      portfolioItem: {},
       status: {
         isUp: false,
         isDown: false,
@@ -99,7 +98,6 @@ export default {
       this.isEditing = !this.isEditing
     },
     hideOptions () {
-      // this.fetchPortFolioItem()
       this.isEditing = false
     },
     openCryptoPage () {
