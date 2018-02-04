@@ -63,12 +63,10 @@ export default {
 
 <style lang="css">
   .panel {
-    height: 600px;
+    min-height: 600px;
     display: block;
     background: #fff;
     width: 100%;
-    top: 0;
-    position: relative;
     z-index: 9999;
     text-align: center;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;

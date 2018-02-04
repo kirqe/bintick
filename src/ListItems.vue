@@ -31,4 +31,26 @@ export default {
 </script>
 
 <style lang="css">
+.list-items-wrapper{
+  width: 370px;
+  max-height: 600px;
+  overflow-y: scroll;
+}
+.list-items-wrapper::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+.list-items-wrapper::-webkit-scrollbar
+{
+	width: 2px;
+	background-color: #F5F5F5;
+}
+
+.list-items-wrapper::-webkit-scrollbar-thumb
+{
+	background-color: #000000;
+	border: 2px solid #555555;
+}
 </style>

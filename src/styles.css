@@ -2,7 +2,6 @@
 
 .header-panel {
   background: #f8f8f8;
-  position: absolute;
   top: 0;
   width: 370px;
   padding: 10px;
@@ -22,14 +21,13 @@
 .portfolio {
   width: 100%;
   position: absolute;
-  /* margin-top: 50px; */
   background-color: #209cee;
-  /* margin-bottom: 50px; */
   z-index: 999;
 }
 
 .list-items-wrapper {
-  /* margin-top: 75px; */
+  max-height: 550px;
+  overflow-y: scroll;
 }
 
 .plr3 {
@@ -50,16 +48,11 @@
 
 .results {
   margin-top: 50px;
-
 }
 
 .table .crypto-icon img {
   width: 30px;
   vertical-align: middle;
-}
-
-.list-items {
-  margin-top: 50px;
 }
 
 .list-item {

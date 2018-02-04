@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="header-panel">
+    <div class="header-panel" v-if="!panel">
       <div class="is-pulled-left">
         <div class="control">
           <input v-model="searchTerm" class="input is-small" type="text" placeholder="Search...">
@@ -185,24 +185,6 @@ export default {
   color: #2c3e50;
   width: 370px;
   max-height: 600px;
-  overflow-y: scroll;
-}
-
-#app::-webkit-scrollbar-track
-{
-	-webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
-	background-color: #F5F5F5;
-}
-
-#app::-webkit-scrollbar
-{
-	width: 2px;
-	background-color: #F5F5F5;
-}
-
-#app::-webkit-scrollbar-thumb
-{
-	background-color: #000000;
-	border: 2px solid #555555;
+  /* overflow-y: scroll; */
 }
 </style>
