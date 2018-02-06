@@ -1,5 +1,4 @@
 import Vue from 'vue'
-
 import axios from 'axios'
 import _ from 'underscore'
 import $ from 'jquery';
@@ -11,7 +10,6 @@ window.axios = require('axios');
 import App from './App.vue'
 import Styles from './styles.css'
 window.background = require('../background');
-
 
 new Vue({
   el: '#app',

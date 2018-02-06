@@ -14,16 +14,13 @@
         :rates="rates"
         :crypto_rates="crypto_rates"></list-item>
     </ul>
-    <div v-if="!loaded" class="loader-wrap">
-      <img src="./loader.gif" class="loader-i"/>
-    </div>
   </div>
 </template>
 
 <script>
 import ListItem from './ListItem.vue'
 export default {
-  props: ["cryptos", "loaded", "rates", "currency", "crypto_rates"],
+  props: ["cryptos", "rates", "currency", "crypto_rates"],
   components: {
     ListItem
   }

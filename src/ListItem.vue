@@ -27,7 +27,6 @@
                                   still: status.isStill }">
             {{ percentDifference(crypto) }}
           </strong>
-
       </span>
     </div>
 
@@ -38,7 +37,7 @@
 <script>
 import ListItemOptions from './ListItemOptions.vue'
 export default {
-  props: ["crypto", "loaded", "currency", "rates", "crypto_rates"],
+  props: ["crypto", "currency", "rates", "crypto_rates"],
   components: {
     ListItemOptions
   },

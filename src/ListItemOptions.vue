@@ -5,7 +5,6 @@
       <div class="control">
         <input class="input is-small" v-model="crypto.portfolio.holdings" type="number" placeholder="Quantity" :min="0.00000000">
       </div>
-      <!-- <p class="help">This is a help text</p> -->
     </div>
 
     <div class="field">
@@ -16,7 +15,6 @@
         v-model="crypto.portfolio.notify_above"
         @focus="setAboveDefault()">
       </div>
-      <!-- <p class="help">This is a help text</p> -->
     </div>
 
     <div class="field">
@@ -26,21 +24,22 @@
         v-model="crypto.portfolio.notify_below"
         @focus="setBelowDefault()">
       </div>
-      <!-- <p class="help">This is a help text</p> -->
     </div>
 
     <div class="field">
       <div class="control">
         <input type="checkbox" :symbol="crypto.symbol" v-model="crypto.portfolio.notify">
         <label :for="crypto.symbol">Show notifications</label>
-        <a class="button is-info is-small is-pulled-right" @click="save">Save</a>
+        <div class="is-pulled-right">
+          <a v-if="crypto.portfolio.holdings > 0 || crypto.portfolio.notify" class="button is-danger is-small" @click="clear">Clear</a>
+          <a class="button is-info is-small" @click="save">Save</a>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import _ from 'underscore'
 export default {
   props: ["crypto"],
   methods: {
@@ -61,6 +60,19 @@ export default {
         var newData = _.map(data.storage_cryptos, (item) => {
           if (item.symbol == this.crypto.symbol) {
             return this.crypto
+          } else {
+            return item
+          }
+        })
+        chrome.storage.local.set({'storage_cryptos': newData})
+        this.$emit('done')
+      })
+    },
+    clear () {
+      chrome.storage.local.get('storage_cryptos', (data) => {
+        var newData = _.map(data.storage_cryptos, (item) => {
+          if (item.symbol == this.crypto.symbol) {
+            return _.extendOwn(this.crypto, { portfolio: { holdings: 0, notify: false, notify_above: null, notify_below: null } })
           } else {
             return item
           }
