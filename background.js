@@ -22,14 +22,11 @@ var fetchNewData = () => {
       bnbbtc: _.find(data[0], { symbol: "BNBBTC" }),
     }
 
-  var new_cryptos = data[0]
-  var new_rates = data[1]
-
   chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates'], (data) => {
-    var cryptosToSave = _.map(_.groupBy(_.union(data.storage_cryptos, new_cryptos), "symbol"), (item) => {
+    var cryptosToSave = _.map(_.groupBy(_.union(data.storage_cryptos, data[0]), "symbol"), (item) => {
       return _.extendOwn(item[0], item[1])
     })
-    chrome.storage.local.set({'storage_cryptos': cryptosToSave, 'rates': new_rates, 'crypto_rates': crypto_rates }) })
+    chrome.storage.local.set({'storage_cryptos': cryptosToSave, 'rates': data[1], 'crypto_rates': crypto_rates }) })
   })
 }
 
@@ -75,29 +72,32 @@ var createNotification = (item, direction, curr, fvalue) => {
     })
 }
 
+var checkWatchItems = () => {
+  chrome.storage.local.get(['storage_cryptos', 'crypto_rates', 'rates', 'currency'], data => {
+    var fvalue = 0
+    var watch_items = _.filter(data.storage_cryptos, (item) => {
+          return item.portfolio.notify
+        })
+
+    for(var i = 0; i < watch_items.length; i++) {
+      if (typeof watch_items[i].portfolio.notify_above === 'undefined') {
+        return
+      } else if (watch_items[i].lastPrice > watch_items[i].portfolio.notify_above) {
+        fvalue = calcPrice(watch_items[i], data)
+        createNotification(watch_items[i], "above", data.rates[data.currency]["symbol"], fvalue)
+      }
+
+      if (watch_items[i].portfolio.notify_below == 'undefined') {
+        return
+      } else if (watch_items[i].lastPrice < watch_items[i].portfolio.notify_below) {
+        fvalue = calcPrice(watch_items[i], data)
+        createNotification(watch_items[i], "below", data.rates[data.currency]["symbol"], fvalue)
+      }
+    }
+  })
+}
+
 chrome.alarms.onAlarm.addListener((alarm) => {
     fetchNewData()
-      chrome.storage.local.get(['storage_cryptos', 'crypto_rates', 'rates', 'currency'], data => {
-        var fvalue = 0
-        var watch_items = _.filter(data.storage_cryptos, (item) => {
-              return item.portfolio.notify == true
-            })
-
-        for(var i = 0; i < watch_items.length; i++) {
-          if (typeof watch_items[i].portfolio.notify_above === 'undefined') {
-            return
-          } else if (watch_items[i].lastPrice > watch_items[i].portfolio.notify_above) {
-            fvalue = calcPrice(watch_items[i], data)
-            createNotification(watch_items[i], "above", data.rates[data.currency]["symbol"], fvalue)
-          }
-
-          if (watch_items[i].portfolio.notify_below == 'undefined') {
-            return
-          } else if (watch_items[i].lastPrice < watch_items[i].portfolio.notify_below) {
-            fvalue = calcPrice(watch_items[i], data)
-            createNotification(watch_items[i], "below", data.rates[data.currency]["symbol"], fvalue)
-          }
-        }
-      })
-
+    checkWatchItems()
 });
