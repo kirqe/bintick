@@ -22,11 +22,14 @@ var fetchNewData = () => {
       bnbbtc: _.find(data[0], { symbol: "BNBBTC" }),
     }
 
-  chrome.storage.local.get(['storage_cryptos', 'rates', 'crypto_rates'], (data) => {
-    var cryptosToSave = _.map(_.groupBy(_.union(data.storage_cryptos, data[0]), "symbol"), (item) => {
+  var new_cryptos = data[0]
+  var new_rates = data[1]
+
+  chrome.storage.local.get(['storage_cryptos'], (data) => {
+    var cryptosToSave = _.map(_.groupBy(_.union(data.storage_cryptos, new_cryptos), "symbol"), (item) => {
       return _.extendOwn(item[0], item[1])
     })
-    chrome.storage.local.set({'storage_cryptos': cryptosToSave, 'rates': data[1], 'crypto_rates': crypto_rates }) })
+    chrome.storage.local.set({'storage_cryptos': cryptosToSave, 'rates': new_rates, 'crypto_rates': crypto_rates }) })
   })
 }
 
@@ -87,7 +90,7 @@ var checkWatchItems = () => {
         createNotification(watch_items[i], "above", data.rates[data.currency]["symbol"], fvalue)
       }
 
-      if (watch_items[i].portfolio.notify_below == 'undefined') {
+      if (typeof watch_items[i].portfolio.notify_below === 'undefined') {
         return
       } else if (watch_items[i].lastPrice < watch_items[i].portfolio.notify_below) {
         fvalue = calcPrice(watch_items[i], data)
