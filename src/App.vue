@@ -35,7 +35,8 @@
                       :crypto_rates="crypto_rates"></list-items>
 
     <div class="init-btn-w" v-if="!cryptos">
-      <a class="button is-info is-small" v-bind:class="{'is-loading': loading}" @click="fetchNewData">Fetch and set initial data</a>
+      <a class="button is-info is-small" v-bind:class="{'is-loading': loading}"
+      @click="fetchNewData">Fetch and set initial data</a>
     </div>
 
     <span class="is-warning notify" v-if="this.notice">{{notice}}</span>
@@ -156,7 +157,6 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
   color: #2c3e50;
   width: 370px;
   max-height: 600px;

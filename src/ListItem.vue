@@ -13,8 +13,8 @@
       <span class="list-item-section holdings">
         <span v-if="holdingsValue > 0">
           <small>
-          <span>{{ this.rates[this.currency]["symbol"] }}</span> {{ holdingsValue }}<br/>
-          {{ holdings }}
+            <span>{{ this.rates[this.currency]["symbol"] }}</span> {{ holdingsValue }}<br/>
+            {{ holdings }}
           </small>
         </span>
       </span>
@@ -80,7 +80,6 @@ export default {
       }
       if (this.crypto.symbol.endsWith("USDT")) {
         price = (this.crypto.lastPrice / this.crypto_rates.usdtbtc.lastPrice) *
-
                 this.rates[this.currency]["last"]
       }
       if (this.crypto.symbol.endsWith("BNB")) {
