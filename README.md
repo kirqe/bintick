@@ -19,11 +19,3 @@ yarn run build
 ## License
 
 [MIT](./LICENSE)
-
-
-<sub>Not sure if it's gonna work but... :D</sub><br/>
-<sub>BTC: 1DcDVWdWsPiqNhtsgZgUHg1jtkmMuCr3Qd</sub><br/>
-<sub>LTC: LP5wEmKc7vjTKAwkbU4fJeMFUhE8pCmbHo</sub><br/>
-<sub>ZEC: t1bym8jLN25iAHxnkmU96kUTaPpcu4XMwXv</sub><br/>
-<sub>XRP: rNKBi8ZPTGgBytZokUhT3QYWabrTtZSVjy</sub><br/>
-<sub>XVG: DHfHMRYtvVQkrm4dFdrRcSLcn4x25nFEXP</sub>
