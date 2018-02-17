@@ -7,7 +7,7 @@
     "watchify": "watchify -vd -p browserify-hmr -e -g envify -t cssify src/main.js background.js -o dist/build.js",
     "serve": "http-server -o -s -c 1 -a localhost",
     "dev": "npm-run-all --parallel watchify serve",
-    "build": "cross-env NODE_ENV=production browserify -g envify src/main.js -t [ browserify-css --minify=true --output dist/bundle.css ] | uglifyjs -c warnings=true -m > dist/build.js"
+    "build": "cross-env NODE_ENV=production browserify -g envify src/main.js -t [ browserify-css --minify=true --output dist/bundle.css ] | uglifyjs -c warnings=false -m > dist/build.js"
   },
   "dependencies": {
     "axios": "^0.17.1",
@@ -24,6 +24,7 @@
     "browserify-css": "^0.14.0",
     "browserify-hmr": "^0.3.1",
     "cross-env": "^1.0.6",
+    "cssify": "^1.0.3",
     "envify": "^3.4.1",
     "http-server": "^0.9.0",
     "npm-run-all": "^2.1.2",
@@ -32,7 +33,7 @@
     "watchify": "^3.4.0"
   },
   "browserify": {
-    "transform": [    
+    "transform": [
       "vueify",
       "babelify"
     ]

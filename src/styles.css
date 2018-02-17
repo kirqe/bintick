@@ -76,3 +76,24 @@
   background-color: #f8f8f8;
   padding: 10px;
 }
+.up {
+  background-color: #4caf50;
+  padding: 2px 7px;
+  color: #fff !important;
+  border-radius: 3px;
+  font-size: 0.7em;
+}
+.down {
+  background-color: #f44336;
+  padding: 2px 7px;
+  color: #fff !important;
+  border-radius: 3px;
+  font-size: 0.7em;
+}
+.still {
+  background-color: #607d8b;
+  padding: 2px 7px;
+  color: #fff !important;
+  border-radius: 3px;
+  font-size: 0.7em;
+}

@@ -38,13 +38,11 @@ export default {
 	-webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
 	background-color: #F5F5F5;
 }
-
 .list-items-wrapper::-webkit-scrollbar
 {
 	width: 2px;
 	background-color: #F5F5F5;
 }
-
 .list-items-wrapper::-webkit-scrollbar-thumb
 {
 	background-color: #000000;

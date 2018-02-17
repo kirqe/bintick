@@ -70,7 +70,7 @@ export default {
     if (!navigator.onLine) {
       this.notice = "you are not connected to the internet"
     }
-
+    
     this.fetchStorage()
     chrome.alarms.onAlarm.addListener(() => {
       this.fetchStorage()

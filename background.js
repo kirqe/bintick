@@ -101,6 +101,6 @@ var checkWatchItems = () => {
 }
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-    fetchNewData()
-    checkWatchItems()
+  fetchNewData()
+  checkWatchItems()
 });
