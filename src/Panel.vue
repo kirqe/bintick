@@ -26,6 +26,8 @@
     </small>
     <br/>
     <span style="color: #e25555;">&#9829;</span>
+    <br/>
+    <a @click="resetStorage" class="reset">reset extension data</a>
   </div>
 </template>
 
@@ -41,6 +43,15 @@ export default {
       this.activeOnly = !this.activeOnly
       chrome.storage.local.set({'activeOnly': this.activeOnly})
       this.$emit('activeChanged')
+    },
+    resetStorage() {
+      chrome.storage.local.clear(function() {
+        var error = chrome.runtime.lastError;
+        if (error) {
+          console.error(error);
+        }
+        window.close();
+      });
     }
   },
   mounted () {
@@ -76,5 +87,9 @@ export default {
     font-size: 0.8em;
     padding: 10px;
     border: 3px solid #209cee;
+  }
+  .reset {
+    text-align: center;
+    font-size: 10px;
   }
 </style>
