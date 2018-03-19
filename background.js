@@ -1,13 +1,16 @@
 chrome.alarms.create('check_price', { delayInMinutes: 1, periodInMinutes: 1});
 
+const binance_api = "https://api.binance.com/api/v1/ticker/24hr"
+const blockchain_api = "https://blockchain.info/ticker"
+
 var getCryptos = () => {
-  return axios.get("https://api.binance.com/api/v1/ticker/24hr").then((res) => {
+  return axios.get(binance_api).then((res) => {
     return res.data
   })
 }
 
 var getBtcPrice = () => {
-  return axios.get("https://blockchain.info/ticker").then((res) => {
+  return axios.get(blockchain_api).then((res) => {
     return res.data
   })
 }
@@ -78,9 +81,11 @@ var createNotification = (item, direction, curr, fvalue) => {
 var checkWatchItems = () => {
   chrome.storage.local.get(['storage_cryptos', 'crypto_rates', 'rates', 'currency'], data => {
     var fvalue = 0
-    var watch_items = _.filter(data.storage_cryptos, (item) => {
-          return item.portfolio.notify
+    const storage_cryptos = data.storage_cryptos
+    const watch_items = _.filter(storage_cryptos, (item) => {
+          return item.portfolio.notify == true
         })
+    // console.log(watch_items);
 
     for(var i = 0; i < watch_items.length; i++) {
       if (typeof watch_items[i].portfolio.notify_above === 'undefined') {
