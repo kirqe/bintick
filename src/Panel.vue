@@ -6,7 +6,6 @@
         <a @click="$emit('close')" class="button is-pulled-right">Close</a>
       </div>
     </div>
-    <br/>
     <small>
       <b>What's this? </b><br/>
       Chrome extension for tracking cryptos<br/> with notifications support and some sort of<br/>
