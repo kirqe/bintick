@@ -6,6 +6,7 @@
         <a @click="$emit('close')" class="button is-pulled-right">Close</a>
       </div>
     </div>
+    <br/>
     <small>
       <b>What's this? </b><br/>
       Chrome extension for tracking cryptos<br/> with notifications support and some sort of<br/>
@@ -19,7 +20,6 @@
       <b>Donations always welcome :) </b><br/>
       BTC: 1DcDVWdWsPiqNhtsgZgUHg1jtkmMuCr3Qd<br/>
       LTC: LP5wEmKc7vjTKAwkbU4fJeMFUhE8pCmbHo<br/>
-      ZEC: t1bym8jLN25iAHxnkmU96kUTaPpcu4XMwXv<br/>
       XRP: rNKBi8ZPTGgBytZokUhT3QYWabrTtZSVjy<br/>
       XVG: DHfHMRYtvVQkrm4dFdrRcSLcn4x25nFEXP<br/>
     </small>

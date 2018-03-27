@@ -29,9 +29,6 @@ var fetchNewData = () => {
   var new_rates = data[1]
 
   chrome.storage.local.get(['storage_cryptos'], (data) => {
-    console.log("new cryptos")
-    console.log(new_cryptos)
-    console.log("new cryptos")
     var cryptosToSave = _.map(_.groupBy(_.union(data.storage_cryptos, new_cryptos), "symbol"), (item) => {
       return _.extendOwn(item[0], item[1])
     })
