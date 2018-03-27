@@ -29,6 +29,9 @@ var fetchNewData = () => {
   var new_rates = data[1]
 
   chrome.storage.local.get(['storage_cryptos'], (data) => {
+    console.log("new cryptos")
+    console.log(new_cryptos)
+    console.log("new cryptos")
     var cryptosToSave = _.map(_.groupBy(_.union(data.storage_cryptos, new_cryptos), "symbol"), (item) => {
       return _.extendOwn(item[0], item[1])
     })
@@ -83,8 +86,10 @@ var checkWatchItems = () => {
     var fvalue = 0
     const storage_cryptos = data.storage_cryptos
     const watch_items = _.filter(storage_cryptos, (item) => {
-          return item.portfolio.notify == true
-        })
+      if (item.portfolio && item.portfolio.notify) {
+        return item
+      }
+    })
     // console.log(watch_items);
 
     for(var i = 0; i < watch_items.length; i++) {
