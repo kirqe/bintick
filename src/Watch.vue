@@ -1,9 +1,6 @@
 <template lang="html">
   <div id="watch">
     <section class="hero is-ddark is-fullheight has-text-centered">
-      <div id="info">
-        <a href="https://www.binance.com/?ref=12573751" target="_blank">binance.com/?ref=12573751</a>
-      </div>
       <div class="hero-body">
         <div class="container" v-if="this.crypto && this.rates && this.currency">
           <div class="watch_symbol">
@@ -84,25 +81,11 @@ export default {
 </script>
 
 <style lang="css">
-  .watch_symbol {
-
-  }
   .watch_symbol a, .watch_symbol a:hover {
     color: #f5f5f5;
   }
   .watch_stats {
     font-size: 2em;
-  }
-  .watch_holdings {
-
-  }
-  #info {
-    position: absolute;
-    left: 10px;
-    top: 10px;
-  }
-  #info a {
-    color: #363636;
   }
   .is-ddark {
     background: #0c0c0c;

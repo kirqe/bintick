@@ -10,23 +10,12 @@
     <small>
       <b>What's this? </b><br/>
       Chrome extension for tracking cryptos<br/> with notifications support and some sort of<br/>
-       portfolio functionality. <a href="https://github.com/kirqe/bintick" target="_blank">[source code]</a><br/>
-      <br/>
-      <b>Where do you get the data from? </b><br/>
-      The extension fetches data directly from biance api.<br/> Why binance?<br/> Because it seems to be a really nice exchange.<br/>
-      If you haven't registered yet here's my ref link :)<br/>
-      <a href="https://www.binance.com/?ref=12573751" target="_blank">binance.com/?ref=12573751</a>
-      <br/><br/>
-      <b>Donations always welcome :) </b><br/>
-      BTC: 1DcDVWdWsPiqNhtsgZgUHg1jtkmMuCr3Qd<br/>
-      LTC: LP5wEmKc7vjTKAwkbU4fJeMFUhE8pCmbHo<br/>
-      XRP: rNKBi8ZPTGgBytZokUhT3QYWabrTtZSVjy<br/>
-      XVG: DHfHMRYtvVQkrm4dFdrRcSLcn4x25nFEXP<br/>
+       portfolio functionality. <a href="https://github.com/kirqe/bintick" target="_blank">[git]</a><br/>
     </small>
     <br/>
-    <span style="color: #e25555;">&#9829;</span>
+    <a class="smt" href="https://binance.com/?ref=12573751" target="_blank">binance.com/?ref=12573751</a>
     <br/>
-    <a @click="resetStorage" class="reset">reset extension data</a>
+    <a @click="resetStorage" class="smt">reset extension data</a>
   </div>
 </template>
 
@@ -73,7 +62,7 @@ export default {
 
 <style lang="css">
   .panel {
-    min-height: 600px;
+    min-height: 250px;
     display: block;
     background: #fff;
     width: 100%;
@@ -85,9 +74,8 @@ export default {
     color: #2c3e50;
     font-size: 0.8em;
     padding: 10px;
-    border: 3px solid #209cee;
   }
-  .reset {
+  .smt {
     text-align: center;
     font-size: 10px;
   }
